@@ -23,6 +23,22 @@ import 'screens/movie_details/actor_screen.dart';
 import 'screens/lists/list_detail_screen.dart';
 import 'screens/articles/article_detail_screen.dart';
 
+Route _smoothRoute(Widget page) => PageRouteBuilder(
+      pageBuilder: (_, __, ___) => page,
+      transitionDuration: const Duration(milliseconds: 350),
+      reverseTransitionDuration: const Duration(milliseconds: 250),
+      transitionsBuilder: (_, anim, __, child) => FadeTransition(
+        opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.08, 0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+          child: child,
+        ),
+      ),
+    );
+
 class ThiraiPediaApp extends StatelessWidget {
   const ThiraiPediaApp({super.key});
 
@@ -33,29 +49,34 @@ class ThiraiPediaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       home: const HomeScreen(),
-      routes: {
-        '/search': (_) => const SearchScreen(),
-        '/auth': (_) => const AuthScreen(),
-        '/watchlist': (_) => const WatchlistScreen(),
-        '/coming-soon': (_) => const ComingSoonScreen(),
-        '/profile': (_) => const ProfileScreen(),
-        '/community': (_) => const CommunityScreen(),
-        '/admin': (_) => const AdminScreen(),
-        '/lists': (_) => const ListsScreen(),
-        '/leaderboard': (_) => const LeaderboardScreen(),
-        '/ott-calendar': (_) => const OttCalendarScreen(),
-        '/articles': (_) => const ArticlesScreen(),
-        '/quiz': (_) => const QuizScreen(),
-        '/wheel': (_) => const SpinWheelScreen(),
-        '/blind-frame': (_) => const BlindFrameScreen(),
-        '/mood-matcher': (_) => const MoodMatcherScreen(),
-        '/privacy': (_) => const LegalScreen(page: 'privacy'),
-        '/terms': (_) => const LegalScreen(page: 'terms'),
-        '/about': (_) => const AboutScreen(),
-        '/contact': (_) => const ContactScreen(),
-        '/article-detail': (_) => const ArticleDetailScreen(),
-        '/list-detail': (_) => const ListDetailScreen(),
-        '/actor': (_) => const ActorScreen(),
+      onGenerateRoute: (settings) {
+        final pages = <String, Widget>{
+          '/search': const SearchScreen(),
+          '/auth': const AuthScreen(),
+          '/watchlist': const WatchlistScreen(),
+          '/coming-soon': const ComingSoonScreen(),
+          '/profile': const ProfileScreen(),
+          '/community': const CommunityScreen(),
+          '/admin': const AdminScreen(),
+          '/lists': const ListsScreen(),
+          '/leaderboard': const LeaderboardScreen(),
+          '/ott-calendar': const OttCalendarScreen(),
+          '/articles': const ArticlesScreen(),
+          '/quiz': const QuizScreen(),
+          '/wheel': const SpinWheelScreen(),
+          '/blind-frame': const BlindFrameScreen(),
+          '/mood-matcher': const MoodMatcherScreen(),
+          '/privacy': const LegalScreen(page: 'privacy'),
+          '/terms': const LegalScreen(page: 'terms'),
+          '/about': const AboutScreen(),
+          '/contact': const ContactScreen(),
+          '/article-detail': const ArticleDetailScreen(),
+          '/list-detail': const ListDetailScreen(),
+          '/actor': const ActorScreen(),
+        };
+        final page = pages[settings.name];
+        if (page != null) return _smoothRoute(page);
+        return null;
       },
     );
   }

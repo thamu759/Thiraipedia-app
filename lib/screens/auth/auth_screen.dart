@@ -344,10 +344,10 @@ class _AuthScreenState extends State<AuthScreen> {
       final email = _emailCtl.text.trim();
       if (email.isEmpty) return;
       final success = await auth.register(username, email, password);
-      if (success && mounted) Navigator.pop(context);
+      if (success && mounted) Navigator.pushReplacementNamed(context, '/');
     } else {
       final success = await auth.login(username, password);
-      if (success && mounted) Navigator.pop(context);
+      if (success && mounted) Navigator.pushReplacementNamed(context, '/');
     }
   }
 }
