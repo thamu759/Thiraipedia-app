@@ -5,6 +5,7 @@ import '../../providers/community_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/community_thread.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/skeleton_loading.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -33,7 +34,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       body: Consumer<CommunityProvider>(
         builder: (context, cp, _) {
           if (cp.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const SkeletonLoading(child: ListSkeleton());
           }
           if (cp.threads.isEmpty) {
             return const Center(
@@ -74,7 +75,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 radius: 18,
                 backgroundImage:
                     CachedNetworkImageProvider(thread.avatarUrl),
-                onBackgroundImageError: (_, __) {},
+                onBackgroundImageError: (_, _) {},
                 child: const Icon(Icons.person, size: 16),
               ),
               const SizedBox(width: 10),
@@ -170,7 +171,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: tag,
+                initialValue: tag,
                 items: tags
                     .map((t) => DropdownMenuItem(
                         value: t, child: Text(t)))
@@ -189,7 +190,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
           ElevatedButton(
             onPressed: () {
               if (titleCtl.text.isEmpty ||
-                  bodyCtl.text.isEmpty) return;
+                  bodyCtl.text.isEmpty) {
+                return;
+              }
               final auth = context.read<AuthProvider>();
               context
                   .read<CommunityProvider>()

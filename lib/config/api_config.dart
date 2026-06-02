@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String baseUrl = 'https://www.cinevistaa.in';
+  static const String baseUrl = 'https://cinevistaa.onrender.com';
   static const String apiUrl = '$baseUrl/api';
 
   static const Duration timeout = Duration(seconds: 30);

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/list_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/skeleton_loading.dart';
 
 class ListsScreen extends StatefulWidget {
   const ListsScreen({super.key});
@@ -31,7 +32,7 @@ class _ListsScreenState extends State<ListsScreen> {
       body: Consumer<ListProvider>(
         builder: (context, lp, _) {
           if (lp.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const SkeletonLoading(child: ListSkeleton());
           }
           if (lp.lists.isEmpty) {
             return const Center(

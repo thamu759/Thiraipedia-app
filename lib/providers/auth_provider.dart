@@ -81,4 +81,9 @@ class AuthProvider with ChangeNotifier {
   }
 
   String get token => _user?.token ?? '';
+  User? get currentUser => _user;
+
+  Future<void> verifySession() async {
+    await loadUser();
+  }
 }

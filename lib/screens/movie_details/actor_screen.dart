@@ -25,7 +25,7 @@ class ActorScreen extends StatelessWidget {
               radius: 80,
               backgroundImage:
                   CachedNetworkImageProvider(member.avatarUrl),
-              onBackgroundImageError: (_, __) {},
+              onBackgroundImageError: (_, _) {},
               child: const Icon(Icons.person, size: 60),
             ),
             const SizedBox(height: 20),

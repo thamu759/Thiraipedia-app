@@ -4,6 +4,7 @@ import '../../providers/watchlist_provider.dart';
 import '../../providers/movie_provider.dart';
 import '../../models/movie.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/skeleton_loading.dart';
 import '../movie_details/movie_details_screen.dart';
 
 class WatchlistScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     if (wl.isEmpty) return;
     setState(() => _loading = true);
     final mp = context.read<MovieProvider>();
-    await mp.fetchMovies();
+    await mp.loadMovies();
     final allMovies = mp.movies;
     setState(() {
       _watchlistMovies =
@@ -61,7 +62,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
             );
           }
           if (_loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const SkeletonLoading(child: ListSkeleton());
           }
           final movies = _watchlistMovies ?? [];
           return RefreshIndicator(

@@ -1,11 +1,11 @@
 {
-    "name": "thiraipedia_app",
-    "short_name": "thiraipedia_app",
+    "name": "Thiraipedia",
+    "short_name": "Thiraipedia",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0a0a14",
+    "theme_color": "#0a0a14",
+    "description": "Thiraipedia - Film Critique & Movie Database",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

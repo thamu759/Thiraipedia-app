@@ -112,6 +112,7 @@ class Movie {
   final String language;
   final String posterUrl;
   final String backdropUrl;
+  final String titleLogo;
   final int? tmdbId;
   final bool isHero;
   final bool isStaffPick;
@@ -140,6 +141,7 @@ class Movie {
     this.language = '',
     this.posterUrl = '',
     this.backdropUrl = '',
+    this.titleLogo = '',
     this.tmdbId,
     this.isHero = false,
     this.isStaffPick = false,
@@ -170,6 +172,7 @@ class Movie {
       language: json['language'] ?? '',
       posterUrl: json['posterUrl'] ?? '',
       backdropUrl: json['backdropUrl'] ?? '',
+      titleLogo: json['titleLogo'] ?? '',
       tmdbId: json['tmdbId'],
       isHero: json['isHero'] ?? false,
       isStaffPick: json['isStaffPick'] ?? false,
@@ -190,4 +193,23 @@ class Movie {
   }
 
   double get displayRating => rating;
+
+  String get displayLanguage {
+    switch (language.toUpperCase()) {
+      case 'TA':
+        return 'Tamil';
+      case 'ML':
+        return 'Malayalam';
+      case 'TE':
+        return 'Telugu';
+      case 'KN':
+        return 'Kannada';
+      case 'HI':
+        return 'Hindi';
+      case 'EN':
+        return 'English';
+      default:
+        return language.isNotEmpty ? language : 'Unknown';
+    }
+  }
 }

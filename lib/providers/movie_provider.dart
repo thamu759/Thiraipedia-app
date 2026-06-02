@@ -5,56 +5,91 @@ import '../services/api_service.dart';
 class MovieProvider with ChangeNotifier {
   final ApiService _api = ApiService();
   List<Movie> _movies = [];
-  List<Movie> _heroMovies = [];
-  List<Movie> _staffPicks = [];
+  List<Movie> _newReleases = [];
   Movie? _selectedMovie;
   List<Movie> _searchResults = [];
-  bool _loading = false;
-  String? _error;
+  bool _isLoading = false;
   bool _searching = false;
+  String? _error;
+
+  String _selectedGenre = '';
+  String _sortOption = 'rating';
+  String _selectedOttPlatform = '';
 
   List<Movie> get movies => _movies;
-  List<Movie> get heroMovies => _heroMovies;
-  List<Movie> get staffPicks => _staffPicks;
+  List<Movie> get newReleases => _newReleases;
   Movie? get selectedMovie => _selectedMovie;
   List<Movie> get searchResults => _searchResults;
-  bool get loading => _loading;
-  String? get error => _error;
+  bool get isLoading => _isLoading;
   bool get searching => _searching;
+  String? get error => _error;
 
-  Future<void> fetchMovies({
-    String? search,
-    String? genre,
-    String? sort,
-    String? ottPlatform,
-  }) async {
-    _loading = true;
+  String get selectedGenre => _selectedGenre;
+  String get sortOption => _sortOption;
+  String get selectedOttPlatform => _selectedOttPlatform;
+
+  List<Movie> get heroMovies => _movies.where((m) => m.isHero).toList();
+  List<Movie> get staffPicks => _movies.where((m) => m.isStaffPick).toList();
+  List<Movie> get tamilMovies =>
+      _movies.where((m) {
+        final lang = m.language.toUpperCase();
+        return lang == 'TA' || lang == 'TAMIL';
+      }).toList();
+  List<Movie> get malayalamMovies =>
+      _movies.where((m) {
+        final lang = m.language.toUpperCase();
+        return lang == 'ML' || lang == 'MALAYALAM';
+      }).toList();
+  List<Movie> get topRatedMovies =>
+      _movies.where((m) => m.rating >= 7).toList()
+        ..sort((a, b) => b.rating.compareTo(a.rating));
+
+  List<Movie> get similarMovies {
+    final genre = _selectedMovie?.genre ?? '';
+    if (genre.isEmpty) return [];
+    final genres = genre.split('/').map((g) => g.trim().toLowerCase());
+    return _movies
+        .where((m) =>
+            m.id != _selectedMovie?.id &&
+            genres.any((g) => m.genre.toLowerCase().contains(g)))
+        .take(10)
+        .toList();
+  }
+
+  Future<void> loadMovies() async {
+    _isLoading = true;
     _error = null;
     notifyListeners();
     try {
       _movies = await _api.getMovies(
-          search: search, genre: genre, sort: sort, ottPlatform: ottPlatform);
-      _heroMovies = _movies.where((m) => m.isHero).toList();
-      _staffPicks = _movies.where((m) => m.isStaffPick).toList();
-      _loading = false;
-      notifyListeners();
+        genre: _selectedGenre.isNotEmpty ? _selectedGenre : null,
+        sort: _sortOption,
+        ottPlatform: _selectedOttPlatform.isNotEmpty ? _selectedOttPlatform : null,
+      );
     } catch (e) {
       _error = e.toString();
-      _loading = false;
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> fetchMovieById(String id) async {
-    _loading = true;
+  Future<void> loadNewReleases() async {
+    try {
+      final data = await _api.getMovies(sort: 'release-desc');
+      _newReleases = data.where((m) => !m.isUpcoming).take(15).toList();
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> loadMovieById(String id) async {
+    _selectedMovie = null;
     notifyListeners();
     try {
       _selectedMovie = await _api.getMovieById(id);
-      _loading = false;
       notifyListeners();
     } catch (e) {
       _error = e.toString();
-      _loading = false;
       notifyListeners();
     }
   }
@@ -76,6 +111,21 @@ class MovieProvider with ChangeNotifier {
       _searching = false;
       notifyListeners();
     }
+  }
+
+  void setGenre(String genre) {
+    _selectedGenre = genre;
+    loadMovies();
+  }
+
+  void setSort(String sort) {
+    _sortOption = sort;
+    loadMovies();
+  }
+
+  void setOttPlatform(String platform) {
+    _selectedOttPlatform = platform;
+    loadMovies();
   }
 
   Future<void> addReview(String movieId,

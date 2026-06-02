@@ -1,14 +1,19 @@
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:shimmer/shimmer.dart';
-import '../../providers/movie_provider.dart';
+import '../../models/movie.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/movie_provider.dart';
 import '../../providers/watchlist_provider.dart';
-import '../../theme/app_theme.dart';
+import '../../theme/app_colors.dart';
+import '../../widgets/app_bottom_nav.dart';
+import '../../widgets/skeleton_loading.dart';
 import '../movie_details/movie_details_screen.dart';
-import '../profile/profile_screen.dart';
+import '../see_all/see_all_screen.dart';
+import 'widgets/hero_carousel.dart';
+import 'widgets/movie_section.dart';
+import 'widgets/staff_picks_section.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,427 +22,342 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _currentNavIndex = 0;
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MovieProvider>().fetchMovies();
-      context.read<AuthProvider>().loadUser();
-      context.read<WatchlistProvider>().loadWatchlist();
-    });
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refresh();
+  }
+
+  void _refresh() {
+    context.read<AuthProvider>().verifySession();
+    context.read<MovieProvider>().loadMovies();
+    context.read<MovieProvider>().loadNewReleases();
+  }
+
+  void _navigateTo(String route) {
+    Navigator.pushNamed(context, route);
+  }
+
+  void _navigateToMovie(String movieId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => MovieDetailsScreen(movieId: movieId)),
+    );
+  }
+
+  void _navigateToSeeAll(String title, List<Movie> movies) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => SeeAllScreen(title: title, movies: movies)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final screens = [_buildHomeTab(), _buildExploreTab(), _buildProfileTab()];
+    final mp = context.watch<MovieProvider>();
 
     return Scaffold(
-      body: screens[_currentNavIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentNavIndex,
-        onTap: (i) => setState(() => _currentNavIndex = i),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHomeTab() {
-    return SafeArea(
-      child: RefreshIndicator(
-        onRefresh: () => context.read<MovieProvider>().fetchMovies(),
-        child: SingleChildScrollView(
+      bottomNavigationBar: const AppBottomNav(activeIndex: 0),
+      body: mp.isLoading && mp.movies.isEmpty
+          ? const SkeletonLoading(child: HomeSkeleton())
+          : mp.error != null && mp.movies.isEmpty
+              ? _buildError(mp.error!)
+              : CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              _buildHeroCarousel(),
-              _buildSectionTitle('Staff Picks'),
-              _buildStaffPicks(),
-              _buildSectionTitle('Trending Now'),
-              _buildMovieGrid(),
-            ],
-          ),
+          slivers: [
+            SliverPersistentHeader(
+              pinned: false,
+              floating: false,
+              delegate: _HeaderDelegate(maxHeight: MediaQuery.of(context).padding.top + 100),
+            ),
+            SliverToBoxAdapter(
+              child: _buildContent(mp),
+            ),
+          ],
         ),
-      ),
     );
   }
 
-  Widget _buildExploreTab() {
-    return SafeArea(
-      child: Column(
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 8),
-          _buildExploreGrid(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileTab() {
-    return SafeArea(
-      child: Consumer<AuthProvider>(
-        builder: (context, auth, _) {
-          if (!auth.isLoggedIn) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.person_outline,
-                      size: 80, color: AppTheme.textMuted),
-                  const SizedBox(height: 16),
-                  const Text('Sign in to see your profile',
-                      style: TextStyle(color: AppTheme.textSecondary)),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                      onPressed: () =>
-                          Navigator.pushNamed(context, '/auth'),
-                      child: const Text('Sign In')),
-                ],
-              ),
-            );
-          }
-          return const ProfileScreen();
-        },
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('thiraipedia',
-                  style: TextStyle(
-                    color: AppTheme.primaryColor,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  )),
-              const Text('Film Critique & Reviews',
-                  style:
-                      TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-            ],
-          ),
-          const Spacer(),
-          IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () => Navigator.pushNamed(context, '/search')),
-          Consumer<WatchlistProvider>(
-            builder: (_, wl, __) => Stack(
-              children: [
-                IconButton(
-                    icon: const Icon(Icons.bookmark_border),
-                    onPressed: () =>
-                        Navigator.pushNamed(context, '/watchlist')),
-                if (wl.count > 0)
-                  Positioned(
-                    right: 6,
-                    top: 6,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                          color: AppTheme.primaryColor,
-                          shape: BoxShape.circle),
-                      child: Text('${wl.count}',
-                          style: const TextStyle(fontSize: 10)),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeroCarousel() {
-    return Consumer<MovieProvider>(
-      builder: (context, mp, _) {
-        if (mp.loading && mp.heroMovies.isEmpty) {
-          return Shimmer.fromColors(
-            baseColor: AppTheme.surfaceColor,
-            highlightColor: AppTheme.borderColor,
-            child: Container(
-              height: 420,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: AppTheme.cardColor),
-            ),
-          );
-        }
-        final heroes = mp.heroMovies;
-        if (heroes.isEmpty) return const SizedBox.shrink();
-        return CarouselSlider(
-          options: CarouselOptions(
-            height: 420,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 5),
-            viewportFraction: 0.9,
-            enlargeCenterPage: true,
-          ),
-          items: heroes.map((movie) => _buildHeroCard(movie)).toList(),
-        );
-      },
-    );
-  }
-
-  Widget _buildHeroCard(movie) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => MovieDetailsScreen(movieId: movie.id))),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              image: DecorationImage(
-                image: CachedNetworkImageProvider(movie.backdropUrl),
-                fit: BoxFit.cover,
-                onError: (_, __) =>
-                    const AssetImage('assets/placeholder.jpg'),
-              ),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.black87],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(movie.title,
-                    style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    _buildRatingBadge(movie.rating),
-                    const SizedBox(width: 8),
-                    Text(movie.genre,
-                        style: const TextStyle(
-                            color: AppTheme.textSecondary, fontSize: 13)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRatingBadge(double rating) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: AppTheme.getRatingGradient(rating)),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(rating.toStringAsFixed(1),
-          style: const TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 13)),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
-      child: Text(title,
-          style: const TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold)),
-    );
-  }
-
-  Widget _buildStaffPicks() {
-    return Consumer<MovieProvider>(
-      builder: (context, mp, _) {
-        final picks =
-            mp.staffPicks.take(8).toList();
-        if (picks.isEmpty) return const SizedBox.shrink();
-        return SizedBox(
-          height: 180,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: picks.length,
-            itemBuilder: (context, i) {
-              final movie = picks[i];
-              return GestureDetector(
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) =>
-                            MovieDetailsScreen(movieId: movie.id))),
-                child: Container(
-                  width: 120,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    image: DecorationImage(
-                      image: CachedNetworkImageProvider(movie.posterUrl),
-                      fit: BoxFit.cover,
-                      onError: (_, __) =>
-                          const AssetImage('assets/placeholder.jpg'),
-                    ),
-                  ),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      margin: const EdgeInsets.all(6),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryColor,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(movie.rating.toStringAsFixed(1),
-                          style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildMovieGrid() {
-    return Consumer<MovieProvider>(
-      builder: (context, mp, _) {
-        if (mp.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final movies = mp.movies;
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            childAspectRatio: 0.6,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-          ),
-          itemCount: movies.length,
-          itemBuilder: (context, i) {
-            final movie = movies[i];
-            return GestureDetector(
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) =>
-                          MovieDetailsScreen(movieId: movie.id))),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CachedNetworkImage(
-                        imageUrl: movie.posterUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => Shimmer.fromColors(
-                          baseColor: AppTheme.surfaceColor,
-                          highlightColor: AppTheme.borderColor,
-                          child: Container(color: AppTheme.cardColor),
-                        ),
-                        errorWidget: (_, __, ___) => Container(
-                          color: AppTheme.cardColor,
-                          child: const Icon(Icons.movie,
-                              color: AppTheme.textMuted),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(movie.title,
-                      style: const TextStyle(fontSize: 11),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildExploreGrid() {
-    return Expanded(
-      child: GridView.count(
-        crossAxisCount: 3,
-        padding: const EdgeInsets.all(16),
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1,
-        children: [
-          _exploreItem(Icons.movie, 'Movies', '/search'),
-          _exploreItem(Icons.people, 'Community', '/community'),
-          _exploreItem(Icons.leaderboard, 'Leaderboard', '/leaderboard'),
-          _exploreItem(Icons.list, 'Lists', '/lists'),
-          _exploreItem(Icons.calendar_today, 'OTT Calendar', '/ott-calendar'),
-          _exploreItem(Icons.article, 'Articles', '/articles'),
-          _exploreItem(Icons.quiz, 'Quiz', '/quiz'),
-          _exploreItem(Icons.games, 'Games', '/wheel'),
-          _exploreItem(Icons.upcoming, 'Coming Soon', '/coming-soon'),
-        ],
-      ),
-    );
-  }
-
-  Widget _exploreItem(IconData icon, String label, String route) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, route),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.cardColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
+  Widget _buildError(String error) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.6,
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: AppTheme.primaryColor, size: 28),
-            const SizedBox(height: 6),
-            Text(label,
-                style: const TextStyle(
-                    fontSize: 11, color: AppTheme.textSecondary),
-                textAlign: TextAlign.center),
+            const Icon(Icons.error_outline, color: AppColors.textMuted, size: 48),
+            const SizedBox(height: 16),
+            const Text('Something went wrong',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  color: AppColors.textMain,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                )),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(error,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    color: AppColors.textMuted,
+                    fontSize: 13,
+                  )),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _refresh,
+              child: const Text('Retry'),
+            ),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildContent(MovieProvider mp) {
+    return Column(
+        children: [
+          if (mp.heroMovies.isNotEmpty)
+            SizedBox(
+              height: 440,
+              child: HeroCarousel(
+                movies: mp.heroMovies,
+                onMovieTap: _navigateToMovie,
+                onWatchlistToggle: (id) => context.read<WatchlistProvider>().toggleWatchlist(id),
+              ),
+            ),
+          const SizedBox(height: 28),
+          if (mp.newReleases.isNotEmpty)
+            MovieSection(
+              title: 'New Release',
+              languageLabel: 'TRENDING',
+              movies: mp.newReleases,
+              onMovieTap: _navigateToMovie,
+              onSeeAll: () => _navigateToSeeAll('New Release', mp.newReleases),
+            ),
+          const SizedBox(height: 28),
+          if (mp.tamilMovies.isNotEmpty)
+            MovieSection(
+              title: 'Tamil Cinema',
+              languageLabel: 'தமிழ்',
+              movies: mp.tamilMovies,
+              onMovieTap: _navigateToMovie,
+              onSeeAll: () => _navigateToSeeAll('Tamil Cinema', mp.tamilMovies),
+            ),
+          const SizedBox(height: 28),
+          if (mp.malayalamMovies.isNotEmpty)
+            MovieSection(
+              title: 'Malayalam Cinema',
+              languageLabel: 'മലയാളം',
+              movies: mp.malayalamMovies,
+              onMovieTap: _navigateToMovie,
+              onSeeAll: () => _navigateToSeeAll('Malayalam Cinema', mp.malayalamMovies),
+            ),
+          const SizedBox(height: 28),
+          if (mp.topRatedMovies.isNotEmpty)
+            MovieSection(
+              title: 'Top Rated',
+              languageLabel: 'BEST',
+              movies: mp.topRatedMovies,
+              onMovieTap: _navigateToMovie,
+              onSeeAll: () => _navigateToSeeAll('Top Rated', mp.topRatedMovies),
+            ),
+          const SizedBox(height: 28),
+          if (mp.staffPicks.isNotEmpty)
+            StaffPicksSection(
+              movies: mp.staffPicks,
+              onMovieTap: _navigateToMovie,
+            ),
+          const SizedBox(height: 28),
+          _buildFunActivities(),
+          const SizedBox(height: 28),
+        ],
+      );
+    }
+
+  Widget _buildFunActivities() {
+    final activities = [
+      ('Quiz', Icons.quiz, '/quiz', 'Test your film knowledge'),
+      ('Spin Wheel', Icons.casino, '/wheel', 'Spin & discover'),
+      ('Blind Frame', Icons.blur_on, '/blind-frame', 'Guess the movie'),
+      ('Mood Matcher', Icons.mood, '/mood-matcher', 'Find by mood'),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+          child: Row(
+            children: [
+              const Text('Fun Activities',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFDDDDDD),
+                  )),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 110,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: activities.length,
+            itemBuilder: (context, index) {
+              final act = activities[index];
+              return GestureDetector(
+                onTap: () => _navigateTo(act.$3),
+                child: Container(
+                  width: 140,
+                  margin: const EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.border),
+                    color: AppColors.bgCard,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(act.$2, color: AppColors.accent, size: 32),
+                      const SizedBox(height: 8),
+                      Text(act.$1,
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            color: AppColors.textMain,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          )),
+                      Text(act.$4,
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            color: AppColors.textMuted,
+                            fontSize: 10,
+                          )),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HeaderDelegate extends SliverPersistentHeaderDelegate {
+  final double maxHeight;
+
+  _HeaderDelegate({required this.maxHeight});
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final maxH = maxHeight;
+    final minH = minExtent;
+    final totalShrink = maxH - minH;
+    final shrink = totalShrink > 0 ? ((maxH - shrinkOffset) / maxH).clamp(0.0, 1.0) : 1.0;
+    final opacity = shrink;
+    final scale = 0.6 + (0.4 * shrink);
+    final lineWidth = 48 + ((1.0 - shrink) * 72);
+    final lineOpacity = shrink;
+    final glowOpacity = 0.2 + (0.8 * shrink);
+    final glassOpacity = (1.0 - shrink).clamp(0.0, 0.85);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.bgDark,
+            AppColors.bgDark.withValues(alpha: 0.3 + (0.4 * shrink)),
+            Color.fromRGBO(10, 10, 20, (0.2 * shrink).clamp(0.0, 0.2)),
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Glass bar on scroll
+          Positioned(
+            top: 0, left: 0, right: 0,
+            child: Opacity(
+              opacity: glassOpacity,
+              child: Container(
+                height: maxH,
+                decoration: BoxDecoration(
+                  color: AppColors.bgDark.withValues(alpha: 0.3),
+                ),
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                    child: const SizedBox.expand(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Content
+          Positioned.fill(
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.diagonal3Values(scale, scale, 1.0),
+                child: Opacity(
+                  opacity: opacity,
+                  child: Image.asset('assets/logo.png', height: 28, fit: BoxFit.contain),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Opacity(
+                opacity: lineOpacity,
+                child: Container(
+                  width: lineWidth, height: 3,
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accent.withValues(alpha: glowOpacity),
+                        blurRadius: 8 + ((1.0 - shrink) * 12),
+                        spreadRadius: (1.0 - shrink) * 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_HeaderDelegate oldDelegate) => true;
+
+  @override
+  double get minExtent => 0;
+  @override
+  double get maxExtent => maxHeight;
 }
