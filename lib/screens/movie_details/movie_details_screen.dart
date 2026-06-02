@@ -1,6 +1,4 @@
 import 'dart:async';
-// ignore_for_file: deprecated_member_use, avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,6 +6,7 @@ import '../../models/movie.dart';
 import '../../providers/movie_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/watchlist_provider.dart';
+import '../../utils/html_utils.dart';
 import '../../widgets/skeleton_loading.dart';
 import 'widgets/cast_section.dart';
 import 'widgets/review_card.dart';
@@ -51,177 +50,19 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
     if (url.isEmpty) return;
     final videoId = _extractVideoId(url);
     if (videoId.isEmpty) {
-      html.window.open(url, '_blank');
+      openWindow(url, '_blank');
       return;
     }
     _trailerId++;
     final containerId = 'trailer-popup-$_trailerId';
-    final existing = html.document.getElementById(containerId);
-    if (existing != null) return;
-
     final embedUrl = 'https://www.youtube.com/embed/$videoId?autoplay=1&controls=0&rel=0&modestbranding=1';
-
-    void showTrailer() {
-      final c = html.document.getElementById(containerId);
-      if (c == null) return;
-      c.innerHtml = '';
-      final wrapper = html.DivElement()
-        ..style.position = 'relative'
-        ..style.width = '90%'
-        ..style.maxWidth = '800px'
-        ..style.aspectRatio = '16/9';
-      final closeBtn = html.DivElement()
-        ..style.position = 'absolute'
-        ..style.top = '12px'
-        ..style.right = '12px'
-        ..style.zIndex = '10000'
-        ..style.width = '40px'
-        ..style.height = '40px'
-        ..style.background = 'rgba(0,0,0,0.7)'
-        ..style.borderRadius = '50%'
-        ..style.display = 'flex'
-        ..style.alignItems = 'center'
-        ..style.justifyContent = 'center'
-        ..style.cursor = 'pointer'
-        ..style.border = '2px solid rgba(255,255,255,0.25)'
-        ..style.boxShadow = '0 2px 12px rgba(0,0,0,0.5)'
-        ..innerHtml = '<span style="color:white;font-size:20px;font-weight:800;font-family:Arial,sans-serif">X</span>'
-        ..onClick.listen((_) => c.remove());
-      final iframe = html.IFrameElement()
-        ..src = embedUrl
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..style.border = 'none'
-        ..style.borderRadius = '12px'
-        ..allow = 'autoplay; encrypted-media; fullscreen'
-        ..allowFullscreen = true;
-      wrapper.append(closeBtn);
-      wrapper.append(iframe);
-      c.append(wrapper);
-    }
-
-    final container = html.DivElement()
-      ..id = containerId
-      ..style.position = 'fixed'
-      ..style.top = '0'
-      ..style.left = '0'
-      ..style.width = '100%'
-      ..style.height = '100%'
-      ..style.zIndex = '9999'
-      ..style.background = 'rgba(0,0,0,0.85)'
-      ..style.display = 'flex'
-      ..style.alignItems = 'center'
-      ..style.justifyContent = 'center';
-    html.document.body?.append(container);
-
-    // Show ad first
-    final adWrapper = html.DivElement()
-      ..style.position = 'relative'
-      ..style.width = '90%'
-      ..style.maxWidth = '800px'
-      ..style.aspectRatio = '16/9'
-      ..style.overflow = 'hidden';
-    final closeBtn = html.DivElement()
-      ..style.position = 'absolute'
-      ..style.top = '12px'
-      ..style.right = '12px'
-      ..style.zIndex = '10000'
-      ..style.width = '40px'
-      ..style.height = '40px'
-      ..style.background = 'rgba(0,0,0,0.7)'
-      ..style.borderRadius = '50%'
-      ..style.display = 'flex'
-      ..style.alignItems = 'center'
-      ..style.justifyContent = 'center'
-      ..style.cursor = 'pointer'
-      ..style.border = '2px solid rgba(255,255,255,0.25)'
-      ..style.boxShadow = '0 2px 12px rgba(0,0,0,0.5)'
-      ..innerHtml = '<span style="color:white;font-size:20px;font-weight:800;font-family:Arial,sans-serif">X</span>'
-      ..onClick.listen((_) {
-        _adTimer?.cancel();
-        container.remove();
-      });
-
-    // Skeleton loading
-    final skeleton = html.DivElement()
-      ..style.position = 'absolute'
-      ..style.top = '0'
-      ..style.left = '0'
-      ..style.width = '100%'
-      ..style.height = '100%'
-      ..style.background = '#1a1a2e'
-      ..style.borderRadius = '12px'
-      ..style.display = 'flex'
-      ..style.alignItems = 'center'
-      ..style.justifyContent = 'center'
-      ..style.zIndex = '9998'
-      ..style.setProperty('flex-direction', 'column')
-      ..style.setProperty('gap', '16px')
-      ..innerHtml = '''
-        <style>
-          @keyframes shimmer {
-            0% { opacity: 0.3; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0.3; }
-          }
-        </style>
-        <div style="width:60px;height:60px;border-radius:16px;background:#2a2a4e;animation:shimmer 1.5s ease-in-out infinite;"></div>
-        <div style="width:120px;height:12px;border-radius:6px;background:#2a2a4e;animation:shimmer 1.5s ease-in-out infinite;"></div>
-      ''';
-
-    final adIframe = html.IFrameElement()
-      ..src = _adVideoUrl
-      ..style.width = '100%'
-      ..style.height = '100%'
-      ..style.border = 'none'
-      ..style.borderRadius = '12px'
-      ..allow = 'autoplay; encrypted-media; fullscreen'
-      ..allowFullscreen = true
-      ..style.pointerEvents = 'none'
-      ..style.display = 'none';
-    final skipBtn = html.DivElement()
-      ..style.position = 'absolute'
-      ..style.bottom = '24px'
-      ..style.right = '24px'
-      ..style.zIndex = '10001'
-      ..style.background = '#FBBF24'
-      ..style.color = 'black'
-      ..style.padding = '10px 20px 10px 18px'
-      ..style.borderRadius = '8px'
-      ..style.fontFamily = 'Poppins, sans-serif'
-      ..style.fontSize = '14px'
-      ..style.fontWeight = '700'
-      ..style.cursor = 'pointer'
-      ..style.display = 'none'
-      ..style.alignItems = 'center'
-      ..style.setProperty('gap', '6px')
-      ..style.boxShadow = '0 4px 16px rgba(0,0,0,0.3)'
-      ..style.transition = 'opacity 0.2s ease'
-      ..innerHtml = '''
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <polygon points="5,3 19,12 5,21" fill="black"/>
-          <rect x="19" y="4" width="2" height="16" rx="1" fill="black" opacity="0.6"/>
-        </svg>
-        <span>Skip</span>
-      '''
-      ..onClick.listen((_) {
-        _adTimer?.cancel();
-        showTrailer();
-      });
-    adIframe.onLoad.listen((_) {
-      adIframe.style.display = '';
-      adIframe.style.pointerEvents = '';
-      skeleton.remove();
-      skipBtn.style.display = 'flex';
-      _adTimer?.cancel();
-      _adTimer = Timer(const Duration(seconds: 6), showTrailer);
-    });
-
-    adWrapper.append(skeleton);
-    adWrapper.append(adIframe);
-    adWrapper.append(skipBtn);
-    adWrapper.append(closeBtn);
-    container.append(adWrapper);
+    showTrailerOverlay(
+      embedUrl: embedUrl,
+      containerId: containerId,
+      adVideoUrl: _adVideoUrl,
+      setState: (fn) { if (mounted) setState(fn); },
+      onAdComplete: () {},
+    );
   }
 
   @override

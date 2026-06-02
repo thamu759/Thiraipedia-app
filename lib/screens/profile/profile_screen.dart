@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use, avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../utils/html_utils.dart';
 import '../../widgets/app_bottom_nav.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -427,21 +426,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               GestureDetector(
-                onTap: () {
-                  final input = html.FileUploadInputElement()
-                    ..accept = 'image/*'
-                    ..click();
-                  input.onChange.listen((_) {
-                    final file = input.files?.first;
-                    if (file == null) return;
-                    final reader = html.FileReader();
-                    reader.readAsDataUrl(file);
-                    reader.onLoadEnd.listen((_) {
-                      setDState(() {
-                        pickedAvatar = reader.result as String;
-                      });
-                    });
-                  });
+                onTap: () async {
+                  final result = await pickImage();
+                  if (result?.dataUrl != null) {
+                    setDState(() => pickedAvatar = result!.dataUrl);
+                  }
                 },
                 child: Stack(
                   children: [
@@ -495,21 +484,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 6),
               GestureDetector(
-                onTap: () {
-                  final input = html.FileUploadInputElement()
-                    ..accept = 'image/*'
-                    ..click();
-                  input.onChange.listen((_) {
-                    final file = input.files?.first;
-                    if (file == null) return;
-                    final reader = html.FileReader();
-                    reader.readAsDataUrl(file);
-                    reader.onLoadEnd.listen((_) {
-                      setDState(() {
-                        pickedAvatar = reader.result as String;
-                      });
-                    });
-                  });
+                onTap: () async {
+                  final result = await pickImage();
+                  if (result?.dataUrl != null) {
+                    setDState(() => pickedAvatar = result!.dataUrl);
+                  }
                 },
                 child: const Text('Change Photo',
                     style: TextStyle(
