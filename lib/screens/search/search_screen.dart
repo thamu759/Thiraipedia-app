@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/movie.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/movie_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/app_bottom_nav.dart';

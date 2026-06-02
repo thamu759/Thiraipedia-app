@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildHeader(user) {
+  Widget _buildHeader(dynamic user) {
     return Stack(
       children: [
         Container(
@@ -240,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStats(user) {
+  Widget _buildStats(dynamic user) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
@@ -456,9 +456,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(19),
                         child: pickedAvatar != null
                             ? Image.network(pickedAvatar!, fit: BoxFit.cover)
-                            : (auth.user?.avatarUrl?.isNotEmpty == true
+                            : (auth.user != null && auth.user!.avatarUrl.isNotEmpty
                                 ? CachedNetworkImage(
-                                    imageUrl: auth.user!.avatarUrl!,
+                                    imageUrl: auth.user!.avatarUrl,
                                     fit: BoxFit.cover,
                                     placeholder: (_, _) =>
                                         Container(color: AppColors.bgDark),
@@ -620,21 +620,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
-
-  void _pickImage(void Function(String dataUrl) onPicked) {
-    final input = html.FileUploadInputElement()
-      ..accept = 'image/*'
-      ..click();
-    input.onChange.listen((_) {
-      final file = input.files?.first;
-      if (file == null) return;
-      final reader = html.FileReader();
-      reader.readAsDataUrl(file);
-      reader.onLoadEnd.listen((_) {
-        onPicked(reader.result as String);
-      });
-    });
   }
 
   void _confirmLogout(AuthProvider auth) {

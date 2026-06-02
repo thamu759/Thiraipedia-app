@@ -17,7 +17,6 @@ class _BlindFrameScreenState extends State<BlindFrameScreen> {
   ];
 
   int _current = 0;
-  String _guess = '';
   bool _revealed = false;
 
   @override
@@ -51,7 +50,7 @@ class _BlindFrameScreenState extends State<BlindFrameScreen> {
                     color: AppTheme.textSecondary, fontSize: 16)),
             const SizedBox(height: 20),
             TextField(
-              onChanged: (v) => _guess = v,
+              onChanged: (_) {},
               decoration: InputDecoration(
                 labelText: 'Guess the movie',
                 hintText: 'Type your answer...',
@@ -75,7 +74,6 @@ class _BlindFrameScreenState extends State<BlindFrameScreen> {
                 onPressed: () {
                   setState(() {
                     _current = (_current + 1) % _movies.length;
-                    _guess = '';
                     _revealed = false;
                   });
                 },
