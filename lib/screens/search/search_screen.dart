@@ -97,7 +97,7 @@ class _SearchScreenState extends State<SearchScreen>
           children: [
             GestureDetector(
               onTap: () => Navigator.pop(context),
-              child: Container(
+              child: SizedBox(
                 width: 48,
                 height: 48,
                 child: const Icon(
