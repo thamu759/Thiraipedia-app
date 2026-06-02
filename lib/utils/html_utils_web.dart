@@ -123,11 +123,11 @@ void showTrailerOverlay({
     ..style.border = '2px solid rgba(255,255,255,0.25)'
     ..style.boxShadow = '0 2px 12px rgba(0,0,0,0.5)'
     ..innerHtml = '<span style="color:white;font-size:20px;font-weight:800;font-family:Arial,sans-serif">X</span>'
-    ..onClick.listen((_) {
-      adTimer?.cancel();
-      container.remove();
-      onClose?.call();
-    });
+      ..onClick.listen((_) {
+        adTimer?.cancel();
+        container.remove();
+        onClose?.call();
+      });
 
   // Skeleton loading
   final skeleton = html.DivElement()
@@ -190,7 +190,7 @@ void showTrailerOverlay({
     '''
     ..onClick.listen((_) {
       adTimer?.cancel();
-      container.remove();
+      container.innerHtml = '';
       showTrailer();
     });
 
@@ -212,7 +212,7 @@ void showTrailerOverlay({
 
   // Auto skip after 10s
   adTimer = Timer(const Duration(seconds: 10), () {
-    container.remove();
+    container.innerHtml = '';
     onAdComplete();
     showTrailer();
   });
