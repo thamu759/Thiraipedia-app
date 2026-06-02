@@ -1,0 +1,36 @@
+# Flutter
+.dart_tool/
+.packages
+build/
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip
+*.dSYM/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+
+# Web
+web/fonts/
+
+# Env
+.env
+.env.local
