@@ -24,10 +24,10 @@ import 'screens/lists/list_detail_screen.dart';
 import 'screens/articles/article_detail_screen.dart';
 
 Route _smoothRoute(Widget page) => PageRouteBuilder(
-      pageBuilder: (_, __, ___) => page,
+      pageBuilder: (_, _, _) => page,
       transitionDuration: const Duration(milliseconds: 350),
       reverseTransitionDuration: const Duration(milliseconds: 250),
-      transitionsBuilder: (_, anim, __, child) => FadeTransition(
+      transitionsBuilder: (_, anim, _, child) => FadeTransition(
         opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
         child: SlideTransition(
           position: Tween<Offset>(
