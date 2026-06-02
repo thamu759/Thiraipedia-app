@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/html_utils.dart';
 
@@ -20,7 +19,6 @@ class TrailerPlayerScreen extends StatefulWidget {
 class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   static int _counter = 0;
   late final String _containerId;
-  String? _embedUrl;
 
   String _extractVideoId(String url) {
     final uri = Uri.tryParse(url);
@@ -39,20 +37,22 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
     super.initState();
     _counter++;
     _containerId = 'trailer-overlay-$_counter';
-    if (kIsWeb) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final id = _extractVideoId(widget.trailerUrl);
       if (id.length > 5 && id.length < 20) {
-        _embedUrl = 'https://www.youtube.com/embed/$id?autoplay=1&rel=0&modestbranding=1';
-      }
-    }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_embedUrl != null) {
-        injectSimpleOverlay(containerId: _containerId, embedUrl: _embedUrl!);
-        if (mounted) Navigator.pop(context);
+        final embedUrl =
+            'https://www.youtube.com/embed/$id?autoplay=1&rel=0&modestbranding=1';
+        showTrailerPopup(
+          context: context,
+          embedUrl: embedUrl,
+          containerId: _containerId,
+          adVideoUrl: '',
+          setState: (fn) {},
+        );
       } else {
         openWindow(widget.trailerUrl, '_blank');
-        if (mounted) Navigator.pop(context);
       }
+      if (mounted) Navigator.pop(context);
     });
   }
 

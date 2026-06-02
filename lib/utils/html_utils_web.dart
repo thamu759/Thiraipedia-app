@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, avoid_web_libraries_in_flutter
 import 'dart:async';
 import 'dart:html' as html;
+import 'package:flutter/widgets.dart';
 
 class FilePickerResult {
   final String? dataUrl;
@@ -256,6 +257,22 @@ void injectSimpleOverlay({
   container.append(iframe);
   container.append(closeBtn);
   html.document.body?.append(container);
+}
+
+void showTrailerPopup({
+  required BuildContext context,
+  required String embedUrl,
+  required String adVideoUrl,
+  required String containerId,
+  required void Function(void Function()) setState,
+}) {
+  showTrailerOverlay(
+    embedUrl: embedUrl,
+    containerId: containerId,
+    adVideoUrl: adVideoUrl,
+    setState: setState,
+    onAdComplete: () {},
+  );
 }
 
 void removeAllChildren(String id) {

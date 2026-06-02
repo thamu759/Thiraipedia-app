@@ -56,12 +56,12 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
     _trailerId++;
     final containerId = 'trailer-popup-$_trailerId';
     final embedUrl = 'https://www.youtube.com/embed/$videoId?autoplay=1&controls=0&rel=0&modestbranding=1';
-    showTrailerOverlay(
+    showTrailerPopup(
+      context: context,
       embedUrl: embedUrl,
       containerId: containerId,
       adVideoUrl: _adVideoUrl,
       setState: (fn) { if (mounted) setState(fn); },
-      onAdComplete: () {},
     );
   }
 
