@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 import '../services/api_service.dart' show ApiService, UnauthorizedException;
 
 class AuthProvider with ChangeNotifier {
   final ApiService _api = ApiService();
-  final _secureStorage = const FlutterSecureStorage();
   User? _user;
   bool _loading = false;
   String? _error;
@@ -18,21 +16,23 @@ class AuthProvider with ChangeNotifier {
   bool get isAdmin => _user?.isAdmin ?? false;
 
   AuthProvider() {
-    ApiService.onUnauthorized = () {
-      _secureStorage.delete(key: 'auth_token');
+    ApiService.onUnauthorized = () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
       _user = null;
       notifyListeners();
     };
   }
 
   Future<void> loadUser() async {
-    final token = await _secureStorage.read(key: 'auth_token');
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
     if (token != null) {
       try {
         _user = await _api.getMe(token);
         notifyListeners();
       } catch (_) {
-        await _secureStorage.delete(key: 'auth_token');
+        await prefs.remove('token');
       }
     }
   }
@@ -43,8 +43,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
     try {
       _user = await _api.login(username, password);
-      await _secureStorage.write(key: 'auth_token', value: _user!.token);
       final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', _user!.token);
       await prefs.setBool('seenOnboarding', true);
       _loading = false;
       notifyListeners();
@@ -98,8 +98,8 @@ class AuthProvider with ChangeNotifier {
           followers: _user!.followers,
           following: _user!.following,
         );
-        await _secureStorage.write(key: 'auth_token', value: _user!.token);
         final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', _user!.token);
         await prefs.setBool('seenOnboarding', true);
         notifyListeners();
       }
@@ -112,7 +112,8 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _secureStorage.delete(key: 'auth_token');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
     _user = null;
     notifyListeners();
   }
