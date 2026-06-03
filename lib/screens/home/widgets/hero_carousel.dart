@@ -8,12 +8,14 @@ class HeroCarousel extends StatefulWidget {
   final List<Movie> movies;
   final void Function(String movieId) onMovieTap;
   final void Function(String movieId) onWatchlistToggle;
+  final bool Function(String movieId) isInWatchlist;
 
   const HeroCarousel({
     super.key,
     required this.movies,
     required this.onMovieTap,
     required this.onWatchlistToggle,
+    required this.isInWatchlist,
   });
 
   @override
@@ -110,6 +112,8 @@ class _HeroCarouselState extends State<HeroCarousel> {
                       fit: BoxFit.cover,
                       placeholder: (_, _) => Container(color: AppColors.bgDark),
                       errorWidget: (_, _, _) => Container(color: AppColors.bgDark),
+                      color: Colors.black.withValues(alpha: 0.35),
+                      colorBlendMode: BlendMode.darken,
                     )
                   : Container(color: AppColors.bgDark),
             ),
@@ -229,7 +233,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
                     children: [
                       _actionButton(Icons.play_arrow_rounded, 'View', true, () => widget.onMovieTap(movie.id)),
                       const SizedBox(width: 10),
-                      _actionButton(Icons.bookmark_border, 'Watchlist', false, () => widget.onWatchlistToggle(movie.id)),
+                      _watchlistButton(movie.id),
                     ],
                   ),
                 ],
@@ -257,6 +261,16 @@ class _HeroCarouselState extends State<HeroCarousel> {
             fontWeight: FontWeight.w700,
             letterSpacing: 0.5,
           )),
+    );
+  }
+
+  Widget _watchlistButton(String movieId) {
+    final inWatchlist = widget.isInWatchlist(movieId);
+    return _actionButton(
+      inWatchlist ? Icons.bookmark : Icons.bookmark_border,
+      inWatchlist ? 'In Watchlist' : 'Watchlist',
+      inWatchlist,
+      () => widget.onWatchlistToggle(movieId),
     );
   }
 

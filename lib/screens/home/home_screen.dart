@@ -139,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 movies: mp.heroMovies,
                 onMovieTap: _navigateToMovie,
                 onWatchlistToggle: (id) => context.read<WatchlistProvider>().toggleWatchlist(id),
+                isInWatchlist: (id) => context.read<WatchlistProvider>().isInWatchlist(id),
               ),
             ),
           const SizedBox(height: 28),
