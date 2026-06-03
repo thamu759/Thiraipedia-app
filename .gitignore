@@ -31,9 +31,12 @@ ios/.symlinks/
 # Web
 web/fonts/
 
-# Media / Design assets
-*.psd
-*.sai
+# Media / Design assets (root level)
+/*.jpg
+/*.png
+/*.psd
+/*.mp4
+/*.sai
 
 # Env
 .env
