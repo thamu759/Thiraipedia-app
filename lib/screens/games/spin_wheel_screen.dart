@@ -160,12 +160,11 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
                   // Needle/pointer at top
                   Positioned(
                     top: -8,
-                    child: Container(
-                      width: 0,
-                      height: 0,
+                    child: const SizedBox(
+                      width: 40,
+                      height: 40,
                       child: CustomPaint(
                         painter: _NeedlePainter(),
-                        size: const Size(40, 40),
                       ),
                     ),
                   ),
@@ -329,6 +328,8 @@ class _WheelPainter extends CustomPainter {
 }
 
 class _NeedlePainter extends CustomPainter {
+  const _NeedlePainter();
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()

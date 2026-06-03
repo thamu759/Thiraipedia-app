@@ -18,7 +18,7 @@ class _QuizScreenState extends State<QuizScreen>
   late AnimationController _pulseCtrl;
   late Animation<double> _pulseAnim;
   List<Map<String, dynamic>> _questions = [];
-  int _totalQuestions = 10;
+  final int _totalQuestions = 10;
   int _streak = 0;
 
   final _pool = [
@@ -335,7 +335,7 @@ class _QuizScreenState extends State<QuizScreen>
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 margin: const EdgeInsets.only(bottom: 10),
-                key: ValueKey('$opt-${_current}'),
+                key: ValueKey('$opt-$_current'),
                 child: GestureDetector(
                   onTap: () => _answer(opt),
                   child: Container(
@@ -366,7 +366,7 @@ class _QuizScreenState extends State<QuizScreen>
                                       : Colors.white,
                                   fontFamily: 'Poppins')),
                         ),
-                        if (suffix != null) suffix,
+                        ?suffix,
                       ],
                     ),
                   ),

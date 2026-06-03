@@ -16,7 +16,7 @@ class BlindFrameScreen extends StatefulWidget {
 
 class _BlindFrameScreenState extends State<BlindFrameScreen> {
   List<Movie> _candidates = [];
-  List<Movie> _used = [];
+  final List<Movie> _used = [];
   Movie? _currentMovie;
   List<String> _options = [];
   String? _selected;
