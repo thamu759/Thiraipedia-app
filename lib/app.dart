@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
+import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/search/search_screen.dart';
 import 'screens/auth/auth_screen.dart';
@@ -40,7 +41,8 @@ Route _smoothRoute(Widget page) => PageRouteBuilder(
     );
 
 class ThiraiPediaApp extends StatelessWidget {
-  const ThiraiPediaApp({super.key});
+  final bool showOnboarding;
+  const ThiraiPediaApp({super.key, this.showOnboarding = false});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,7 @@ class ThiraiPediaApp extends StatelessWidget {
       title: 'ThiraiPedia',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const HomeScreen(),
+      home: showOnboarding ? const OnboardingScreen() : const HomeScreen(),
       onGenerateRoute: (settings) {
         final pages = <String, Widget>{
           '/': const HomeScreen(),
