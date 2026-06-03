@@ -169,17 +169,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     return Stack(
       alignment: Alignment.center,
       children: [
-        ...List.generate(6, (i) {
-          final a = (i * pi / 3);
-          final dist = 100.0;
+        ...List.generate(8, (i) {
+          final a = (i * pi / 4);
+          final dist = 90.0 + sin(i * 1.3) * 15;
           return Positioned(
-            left: 140 + cos(a) * dist - 10,
-            top: 140 + sin(a) * dist - 10,
+            left: 140 + cos(a) * dist - 12,
+            top: 140 + sin(a) * dist - 12,
             child: Icon(
-              [Icons.star_rounded, Icons.circle, Icons.diamond_rounded,
-               Icons.star_rounded, Icons.circle, Icons.square_rounded][i],
-              size: 16,
-              color: AppColors.accent.withValues(alpha: 0.2),
+              [Icons.star_rounded, Icons.circle, Icons.diamond_rounded, Icons.square_rounded,
+               Icons.star_rounded, Icons.circle, Icons.diamond_rounded, Icons.square_rounded][i],
+              size: 14 + (i % 3) * 6,
+              color: AppColors.accent.withValues(alpha: 0.15 + (i % 3) * 0.05),
             ),
           );
         }),
@@ -189,27 +189,27 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 120,
-                height: 120,
+                width: 130,
+                height: 130,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppColors.accent.withValues(alpha: 0.25),
-                      AppColors.accent.withValues(alpha: 0.08),
+                      AppColors.accent.withValues(alpha: 0.2),
+                      AppColors.accent.withValues(alpha: 0.05),
                       Colors.transparent,
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.15),
+                      color: AppColors.accent.withValues(alpha: 0.12),
                       blurRadius: 40,
                       spreadRadius: 10,
                     ),
                   ],
                 ),
                 child: Center(
-                  child: Image.asset('assets/logo.png', height: 70, fit: BoxFit.contain),
+                  child: Icon(Icons.rocket_launch_rounded, color: AppColors.accent, size: 48),
                 ),
               ),
               const SizedBox(height: 20),
@@ -227,15 +227,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     color: AppColors.accent.withValues(alpha: 0.7),
                     fontFamily: 'Poppins',
                   )),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _readyIcon(Icons.movie_rounded),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   _readyIcon(Icons.explore_rounded),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   _readyIcon(Icons.auto_awesome_rounded),
+                  const SizedBox(width: 14),
+                  _readyIcon(Icons.favorite_rounded),
                 ],
               ),
             ],
