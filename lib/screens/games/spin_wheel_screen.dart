@@ -21,14 +21,21 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
   final _rng = Random();
 
   final _segmentColors = [
-    const Color(0xFFE57373), const Color(0xFFF06292),
-    const Color(0xFFBA68C8), const Color(0xFF7986CB),
-    const Color(0xFF64B5F6), const Color(0xFF4FC3F7),
-    const Color(0xFF4DB6AC), const Color(0xFF81C784),
-    const Color(0xFFAED581), const Color(0xFFFFD54F),
-    const Color(0xFFFFB74D), const Color(0xFFA1887F),
-    const Color(0xFFE57373), const Color(0xFFBA68C8),
-    const Color(0xFF64B5F6), const Color(0xFF81C784),
+    const Color(0xFFFF6B6B), const Color(0xFFFF8E53),
+    const Color(0xFFFECA57), const Color(0xFF48DBFB),
+    const Color(0xFF0ABDE3), const Color(0xFFA29BFE),
+    const Color(0xFFFD79A8), const Color(0xFF6C5CE7),
+    const Color(0xFF00B894), const Color(0xFF00CEC9),
+    const Color(0xFFE17055), const Color(0xFF636E72),
+    const Color(0xFFFF6B6B), const Color(0xFFFECA57),
+    const Color(0xFF48DBFB), const Color(0xFFA29BFE),
+  ];
+
+  final _icons = [
+    Icons.movie, Icons.star, Icons.play_arrow, Icons.favorite,
+    Icons.flash_on, Icons.explore, Icons.rocket, Icons.auto_awesome,
+    Icons.diamond, Icons.local_fire_department, Icons.whatshot, Icons.thunderstorm,
+    Icons.movie_creation, Icons.videocam, Icons.theaters, Icons.live_tv,
   ];
 
   final _allMovies = [
@@ -37,6 +44,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
     'Whiplash', 'Joker', 'Avengers: Endgame', 'La La Land',
     'Shawshank Redemption', 'Spirited Away', 'Mad Max', 'RRR',
     'Vikram', 'The Batman', 'Dune', 'Oppenheimer',
+    'The Godfather', 'Forrest Gump', 'Gladiator', 'Titanic',
   ];
 
   @override
@@ -44,15 +52,15 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
     super.initState();
     _shuffleMovies();
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 4));
-    _spinAnim = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _spinAnim = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
     _spinAnim.addListener(() {
-      setState(() => _angle = _spinAnim.value * 2 * pi * (6 + _rng.nextDouble() * 3));
+      setState(() => _angle = _spinAnim.value * 2 * pi * (5 + _rng.nextDouble() * 4));
     });
   }
 
   void _shuffleMovies() {
     _movies = List.from(_allMovies)..shuffle(_rng);
-    _movies = _movies.take(_rng.nextInt(3) + 8).toList();
+    _movies = _movies.take(_rng.nextInt(4) + 8).toList();
   }
 
   @override
@@ -88,86 +96,107 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
       ),
       body: Column(
         children: [
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           const Text('Tap SPIN to pick a random movie!',
               style: TextStyle(color: AppColors.textMuted, fontSize: 13, fontFamily: 'Poppins')),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           Expanded(
             child: Center(
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Outer glow
+                  // Outer glow ring
                   Container(
-                    width: 310,
-                    height: 310,
+                    width: 330,
+                    height: 330,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.accent.withValues(alpha: _spinning ? 0.3 : 0.15),
-                          blurRadius: 40,
-                          spreadRadius: 5,
+                          color: AppColors.accent.withValues(alpha: _spinning ? 0.25 : 0.1),
+                          blurRadius: 60,
+                          spreadRadius: 10,
                         ),
                       ],
                     ),
                   ),
-                  // Wheel
+                  // Decorative outer ring with dots
+                  CustomPaint(
+                    size: const Size(330, 330),
+                    painter: _OuterRingPainter(),
+                  ),
+                  // The wheel
                   Transform.rotate(
                     angle: _angle,
                     child: Container(
-                      width: 290,
-                      height: 290,
+                      width: 280,
+                      height: 280,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.accent.withValues(alpha: 0.5), width: 3),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            blurRadius: 15,
-                            spreadRadius: 2,
+                            color: Colors.black.withValues(alpha: 0.6),
+                            blurRadius: 20,
+                            spreadRadius: 5,
                           ),
                         ],
                       ),
                       child: CustomPaint(
-                        painter: _WheelPainter(_movies, _segmentColors),
-                        child: Center(
-                          child: Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [
-                                  AppColors.accent,
-                                  AppColors.accent.withValues(alpha: 0.6),
-                                ],
-                              ),
-                              border: Border.all(color: Colors.white24, width: 2),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.accent.withValues(alpha: 0.4),
-                                  blurRadius: 10,
-                                ),
-                              ],
+                        size: const Size(280, 280),
+                        painter: _WheelPainter(_movies, _segmentColors, _icons),
+                      ),
+                    ),
+                  ),
+                  // Center hub with gradient
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const RadialGradient(
+                        colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
+                      ),
+                      border: Border.all(color: Colors.white54, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.accent.withValues(alpha: 0.5),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.star, size: 28, color: Colors.black87),
+                  ),
+                  // Needle with decoration
+                  Positioned(
+                    top: -6,
+                    child: CustomPaint(
+                      size: const Size(36, 48),
+                      painter: _NeedlePainter(),
+                    ),
+                  ),
+                  // Small decorative lights around the wheel
+                  ...List.generate(12, (i) {
+                    final a = i * (pi / 6);
+                    return Positioned(
+                      left: 165 + 155 * cos(a) - 5,
+                      top: 165 + 155 * sin(a) - 5,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: i.isEven ? AppColors.accent : Colors.white54,
+                          boxShadow: [
+                            BoxShadow(
+                              color: (i.isEven ? AppColors.accent : Colors.white38).withValues(alpha: 0.5),
+                              blurRadius: 6,
                             ),
-                            child: const Icon(Icons.movie, size: 22, color: Colors.black),
-                          ),
+                          ],
                         ),
                       ),
-                    ),
-                  ),
-                  // Needle/pointer at top
-                  Positioned(
-                    top: -8,
-                    child: const SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CustomPaint(
-                        painter: _NeedlePainter(),
-                      ),
-                    ),
-                  ),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -187,14 +216,14 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
                 children: [
                   if (_winIndex != null)
                     Container(
-                      width: 36, height: 36,
+                      width: 44, height: 44,
                       decoration: BoxDecoration(
                         color: _segmentColors[_winIndex! % _segmentColors.length],
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.movie, size: 20, color: Colors.white),
+                      child: Icon(_icons[_winIndex! % _icons.length], size: 22, color: Colors.white),
                     ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -212,21 +241,18 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
           GestureDetector(
             onTap: _spinning ? null : _spin,
             child: Container(
-              width: 160,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              width: 180,
+              padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.accent,
-                    AppColors.accent.withValues(alpha: 0.7),
-                  ],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
                 ),
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accent.withValues(alpha: _spinning ? 0.1 : 0.4),
-                    blurRadius: 15,
-                    spreadRadius: 1,
+                    color: AppColors.accent.withValues(alpha: _spinning ? 0.1 : 0.5),
+                    blurRadius: 20,
+                    spreadRadius: 2,
                   ),
                 ],
               ),
@@ -235,7 +261,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
                 children: [
                   Icon(
                     _spinning ? Icons.hourglass_top : Icons.casino,
-                    color: Colors.black,
+                    color: Colors.black87,
                     size: 22,
                   ),
                   const SizedBox(width: 8),
@@ -244,9 +270,9 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: Colors.black,
+                      color: Colors.black87,
                       fontFamily: 'Poppins',
-                      letterSpacing: 1,
+                      letterSpacing: 1.5,
                     ),
                   ),
                 ],
@@ -260,11 +286,36 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
   }
 }
 
+class _OuterRingPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // Outer gold ring
+    final ringPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.transparent,
+          AppColors.accent.withValues(alpha: 0.15),
+          AppColors.accent.withValues(alpha: 0.05),
+          Colors.transparent,
+        ],
+        stops: const [0.85, 0.92, 0.96, 1.0],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+    canvas.drawCircle(center, radius, ringPaint);
+  }
+
+  @override
+  bool shouldRepaint(_OuterRingPainter old) => false;
+}
+
 class _WheelPainter extends CustomPainter {
   final List<String> movies;
   final List<Color> colors;
+  final List<IconData> icons;
 
-  _WheelPainter(this.movies, this.colors);
+  _WheelPainter(this.movies, this.colors, this.icons);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -275,14 +326,24 @@ class _WheelPainter extends CustomPainter {
     final sweep = 2 * pi / count;
 
     for (int i = 0; i < count; i++) {
-      final paint = Paint()..color = colors[i % colors.length];
       final startAngle = -pi / 2 + i * sweep;
+
+      // Draw segment with shadow
+      final paint = Paint()..color = colors[i % colors.length];
       canvas.drawArc(rect, startAngle, sweep, true, paint);
 
-      // Border line
+      // Draw inner lighter highlight on each segment
+      final highlightPaint = Paint()
+        ..color = Colors.white.withValues(alpha: 0.08);
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius * 0.85),
+        startAngle, sweep, true, highlightPaint,
+      );
+
+      // Segment border
       final linePaint = Paint()
         ..color = Colors.white.withValues(alpha: 0.2)
-        ..strokeWidth = 1;
+        ..strokeWidth = 1.5;
       final angle = startAngle;
       canvas.drawLine(
         center,
@@ -292,34 +353,43 @@ class _WheelPainter extends CustomPainter {
 
       // Draw text
       final textAngle = startAngle + sweep / 2;
+      canvas.save();
+      canvas.translate(center.dx, center.dy);
+      canvas.rotate(textAngle);
+
       final textPainter = TextPainter(
         text: TextSpan(
           text: movies[i],
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.9),
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
+            color: Colors.white.withValues(alpha: 0.95),
+            fontSize: 9.5,
+            fontWeight: FontWeight.w700,
             fontFamily: 'Poppins',
+            shadows: const [Shadow(color: Colors.black54, blurRadius: 3)],
           ),
         ),
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: radius * 0.5);
 
-      canvas.save();
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(textAngle);
-      final tx = radius * 0.48;
+      final tx = radius * 0.46;
       canvas.translate(tx - textPainter.width / 2, -textPainter.height / 2);
       textPainter.paint(canvas, Offset.zero);
       canvas.restore();
     }
 
-    // Outer ring
-    final ringPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1)
+    // Inner ring
+    final innerRing = Paint()
+      ..color = Colors.white.withValues(alpha: 0.08)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
-    canvas.drawCircle(center, radius - 2, ringPaint);
+      ..strokeWidth = 2;
+    canvas.drawCircle(center, radius * 0.78, innerRing);
+
+    // Outer ring
+    final outerRing = Paint()
+      ..color = Colors.white.withValues(alpha: 0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    canvas.drawCircle(center, radius - 2, outerRing);
   }
 
   @override
@@ -332,20 +402,50 @@ class _NeedlePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final centerX = size.width / 2;
+
+    // Shadow
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    final shadowPath = Path()
+      ..moveTo(centerX, size.height - 2)
+      ..lineTo(centerX - 12, 6)
+      ..lineTo(centerX + 12, 6)
+      ..close();
+    canvas.drawPath(shadowPath, shadowPaint);
+
+    // Needle body
     final paint = Paint()
-      ..color = AppColors.accent
-      ..style = PaintingStyle.fill;
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [const Color(0xFFFFD700), const Color(0xFFFF8C00)],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
     final path = Path()
-      ..moveTo(size.width / 2, size.height)
-      ..lineTo(size.width / 2 - 10, 0)
-      ..lineTo(size.width / 2 + 10, 0)
+      ..moveTo(centerX, size.height)
+      ..lineTo(centerX - 10, 4)
+      ..lineTo(centerX + 10, 4)
       ..close();
     canvas.drawPath(path, paint);
-    // Circle on top
+
+    // Needle border
+    final borderPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    canvas.drawPath(path, borderPaint);
+
+    // Tip circle
     canvas.drawCircle(
-      Offset(size.width / 2, size.height - 6),
-      5,
-      Paint()..color = Colors.black,
+      Offset(centerX, size.height - 6),
+      6,
+      Paint()..color = const Color(0xFFFFD700),
+    );
+    canvas.drawCircle(
+      Offset(centerX, size.height - 6),
+      3,
+      Paint()..color = Colors.black87,
     );
   }
 
