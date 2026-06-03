@@ -25,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     _controller.initialize().then((_) {
       if (mounted) {
+        _controller.setLooping(false);
         _controller.play();
         setState(() {});
       }
@@ -32,21 +33,26 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) _goToHome();
     });
 
-    _controller.addListener(() {
-      if (_controller.value.isCompleted && mounted) {
-        _goToHome();
-      }
-    });
+    _controller.addListener(_onVideoUpdate);
 
     Future.delayed(const Duration(seconds: 10), () {
       if (mounted) _goToHome();
     });
   }
 
+  void _onVideoUpdate() {
+    if (_controller.value.isInitialized &&
+        _controller.value.duration > Duration.zero &&
+        _controller.value.position >= _controller.value.duration &&
+        mounted) {
+      _goToHome();
+    }
+  }
+
   void _goToHome() {
     if (_navigated) return;
     _navigated = true;
-    _controller.removeListener(() {});
+    _controller.removeListener(_onVideoUpdate);
     _controller.pause();
     Navigator.pushReplacementNamed(context, '/');
   }
