@@ -31,6 +31,10 @@ ios/.symlinks/
 # Web
 web/fonts/
 
+# Media / Design assets
+*.psd
+*.sai
+
 # Env
 .env
 .env.local
