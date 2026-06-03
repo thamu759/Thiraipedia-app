@@ -193,10 +193,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Widget _buildFunActivities() {
     final activities = [
-      ('Quiz', Icons.quiz, '/quiz', 'Test your film knowledge'),
-      ('Spin Wheel', Icons.casino, '/wheel', 'Spin & discover'),
-      ('Blind Frame', Icons.blur_on, '/blind-frame', 'Guess the movie'),
-      ('Mood Matcher', Icons.mood, '/mood-matcher', 'Find by mood'),
+      ('Quiz', Icons.quiz, '/quiz', 'Test your film knowledge', const Color(0xFFE57373)),
+      ('Spin Wheel', Icons.casino, '/wheel', 'Spin & discover', const Color(0xFF64B5F6)),
+      ('Blind Frame', Icons.blur_on, '/blind-frame', 'Guess the movie', const Color(0xFF81C784)),
+      ('Mood Matcher', Icons.mood, '/mood-matcher', 'Find by mood', const Color(0xFFBA68C8)),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,6 +205,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
           child: Row(
             children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.games_rounded, color: AppColors.accent, size: 18),
+              ),
+              const SizedBox(width: 10),
               const Text('Fun Activities',
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -216,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
         ),
         SizedBox(
-          height: 110,
+          height: 130,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -226,18 +235,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               return GestureDetector(
                 onTap: () => _navigateTo(act.$3),
                 child: Container(
-                  width: 140,
-                  margin: const EdgeInsets.only(right: 10),
+                  width: 150,
+                  margin: const EdgeInsets.only(right: 12),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.border),
                     color: AppColors.bgCard,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(act.$2, color: AppColors.accent, size: 32),
-                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: act.$5.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(act.$2, color: act.$5, size: 28),
+                      ),
+                      const SizedBox(height: 10),
                       Text(act.$1,
                           style: const TextStyle(
                             fontFamily: 'Poppins',
@@ -245,6 +261,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           )),
+                      const SizedBox(height: 2),
                       Text(act.$4,
                           style: const TextStyle(
                             fontFamily: 'Poppins',
