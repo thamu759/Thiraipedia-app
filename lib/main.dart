@@ -14,11 +14,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  SystemChrome.setSystemUIChangeCallback((systemOverlaysAreVisible) async {
-    if (systemOverlaysAreVisible) {
-      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    }
-  });
 
   final prefs = await SharedPreferences.getInstance();
   final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
