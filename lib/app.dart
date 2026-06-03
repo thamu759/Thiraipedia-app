@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-import 'screens/splash/splash_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/search/search_screen.dart';
 import 'screens/auth/auth_screen.dart';
@@ -49,7 +48,7 @@ class ThiraiPediaApp extends StatelessWidget {
       title: 'ThiraiPedia',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const SplashScreen(),
+      home: const HomeScreen(),
       onGenerateRoute: (settings) {
         final pages = <String, Widget>{
           '/': const HomeScreen(),
