@@ -194,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _buildFunActivities() {
     final activities = [
       ('Quiz', Icons.quiz, '/quiz', 'Test your film knowledge', const Color(0xFFE57373)),
-      ('Spin Wheel', Icons.casino, '/wheel', 'Spin & discover', const Color(0xFF64B5F6)),
+      ('Card Flix', Icons.style, '/card-flix', 'Swipe & pick', const Color(0xFF64B5F6)),
       ('Blind Frame', Icons.blur_on, '/blind-frame', 'Guess the movie', const Color(0xFF81C784)),
       ('Mood Matcher', Icons.mood, '/mood-matcher', 'Find by mood', const Color(0xFFBA68C8)),
     ];

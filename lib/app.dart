@@ -13,7 +13,7 @@ import 'screens/leaderboard/leaderboard_screen.dart';
 import 'screens/ott_calendar/ott_calendar_screen.dart';
 import 'screens/articles/articles_screen.dart';
 import 'screens/games/quiz_screen.dart';
-import 'screens/games/spin_wheel_screen.dart';
+import 'screens/games/card_flix_screen.dart';
 import 'screens/games/blind_frame_screen.dart';
 import 'screens/games/mood_matcher_screen.dart';
 import 'screens/legal/legal_screen.dart';
@@ -64,7 +64,7 @@ class ThiraiPediaApp extends StatelessWidget {
           '/ott-calendar': const OttCalendarScreen(),
           '/articles': const ArticlesScreen(),
           '/quiz': const QuizScreen(),
-          '/wheel': const SpinWheelScreen(),
+          '/card-flix': const CardFlixScreen(),
           '/blind-frame': const BlindFrameScreen(),
           '/mood-matcher': const MoodMatcherScreen(),
           '/privacy': const LegalScreen(page: 'privacy'),
