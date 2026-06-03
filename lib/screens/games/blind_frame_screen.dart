@@ -60,17 +60,6 @@ class _BlindFrameScreenState extends State<BlindFrameScreen> {
     });
   }
 
-  void _reset() {
-    setState(() {
-      _current = 0;
-      _score = 0;
-      _attempted = 0;
-      _revealed = false;
-      _controller.clear();
-      _feedback = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final movie = _movies[_current];
