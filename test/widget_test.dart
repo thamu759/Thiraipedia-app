@@ -4,6 +4,6 @@ import 'package:thiraipedia_app/app.dart';
 void main() {
   testWidgets('App loads smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const ThiraiPediaApp());
-    expect(find.text('thiraipedia'), findsWidgets);
+    expect(find.text('ThiraiPedia'), findsOneWidget);
   });
 }

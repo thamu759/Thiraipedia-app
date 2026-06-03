@@ -55,4 +55,10 @@ class ListProvider with ChangeNotifier {
     await _api.deleteList(listId, token: token);
     await fetchLists();
   }
+
+  @override
+  void dispose() {
+    _api.dispose();
+    super.dispose();
+  }
 }

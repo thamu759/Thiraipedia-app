@@ -79,7 +79,10 @@ class MovieProvider with ChangeNotifier {
       final data = await _api.getMovies(sort: 'release-desc');
       _newReleases = data.where((m) => !m.isUpcoming).take(15).toList();
       notifyListeners();
-    } catch (_) {}
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
   }
 
   Future<void> loadMovieById(String id) async {
@@ -113,19 +116,19 @@ class MovieProvider with ChangeNotifier {
     }
   }
 
-  void setGenre(String genre) {
+  Future<void> setGenre(String genre) async {
     _selectedGenre = genre;
-    loadMovies();
+    await loadMovies();
   }
 
-  void setSort(String sort) {
+  Future<void> setSort(String sort) async {
     _sortOption = sort;
-    loadMovies();
+    await loadMovies();
   }
 
-  void setOttPlatform(String platform) {
+  Future<void> setOttPlatform(String platform) async {
     _selectedOttPlatform = platform;
-    loadMovies();
+    await loadMovies();
   }
 
   Future<void> addReview(String movieId,
@@ -148,5 +151,11 @@ class MovieProvider with ChangeNotifier {
     _selectedMovie = await _api.addReviewReply(movieId, reviewId,
         body: body, token: token);
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _api.dispose();
+    super.dispose();
   }
 }

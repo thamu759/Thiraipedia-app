@@ -28,9 +28,7 @@ class WatchlistProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleWatchlist(String movieId) async {
-    await toggleMovie(movieId);
-  }
+  Future<void> toggleWatchlist(String movieId) => toggleMovie(movieId);
 
   bool isInWatchlist(String movieId) => _movieIds.contains(movieId);
 

@@ -10,7 +10,6 @@ class AppTheme {
   static const Color surfaceColor = AppColors.bgPanel;
   static const Color cardColor = AppColors.bgCard;
   static const Color textPrimary = AppColors.textMain;
-  static const Color textSecondary = AppColors.textMuted;
   static const Color textMuted = AppColors.textMuted;
   static const Color borderColor = AppColors.border;
   static const Color successColor = Color(0xFF4CAF50);

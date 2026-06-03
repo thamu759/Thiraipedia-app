@@ -84,7 +84,7 @@ class _ListsScreenState extends State<ListsScreen> {
                                       fontSize: 12)),
                             Text('${list.movieIds.length} movies',
                                 style: const TextStyle(
-                                    color: AppTheme.textSecondary,
+                                    color: AppTheme.textMuted,
                                     fontSize: 11)),
                           ],
                         ),
@@ -141,7 +141,7 @@ class _ListsScreenState extends State<ListsScreen> {
                   .createList(
                       name: nameCtl.text,
                       description: descCtl.text,
-                      token: auth.token);
+                      token: auth.token ?? '');
               Navigator.pop(ctx);
             },
             child: const Text('Create'),

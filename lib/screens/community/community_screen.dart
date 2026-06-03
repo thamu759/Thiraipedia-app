@@ -114,7 +114,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                  color: AppTheme.textSecondary, fontSize: 13)),
+                  color: AppTheme.textMuted, fontSize: 13)),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -200,7 +200,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       title: titleCtl.text,
                       body: bodyCtl.text,
                       tag: tag,
-                      token: auth.token);
+                      token: auth.token ?? '');
               Navigator.pop(ctx);
             },
             child: const Text('Post'),

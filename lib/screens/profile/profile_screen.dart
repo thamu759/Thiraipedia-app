@@ -22,7 +22,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
       if (auth.isLoggedIn) {
-        context.read<ProfileProvider>().fetchUser(auth.user!.username);
+        final username = auth.user?.username;
+        if (username != null) {
+          context.read<ProfileProvider>().fetchUser(username);
+        }
       }
     });
   }
@@ -445,7 +448,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(19),
                         child: pickedAvatar != null
-                            ? Image.network(pickedAvatar!, fit: BoxFit.cover)
+                            ? CachedNetworkImage(imageUrl: pickedAvatar!, fit: BoxFit.cover)
                             : (auth.user != null && auth.user!.avatarUrl.isNotEmpty
                                 ? CachedNetworkImage(
                                     imageUrl: auth.user!.avatarUrl,

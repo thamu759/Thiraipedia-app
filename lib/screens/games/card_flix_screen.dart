@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/movie.dart';
 import '../../providers/movie_provider.dart';
 import '../../theme/app_colors.dart';
@@ -409,8 +410,8 @@ class _CardFlixScreenState extends State<CardFlixScreen>
           fit: StackFit.expand,
           children: [
             if (movie.posterUrl.isNotEmpty)
-              Image.network(movie.posterUrl, fit: BoxFit.cover,
-                  errorBuilder: (_, a, b) => _fallbackCard(movie))
+              CachedNetworkImage(imageUrl: movie.posterUrl, fit: BoxFit.cover,
+                  errorWidget: (_, a, b) => _fallbackCard(movie))
             else
               _fallbackCard(movie),
             Positioned.fill(

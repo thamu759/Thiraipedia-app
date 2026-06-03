@@ -138,7 +138,7 @@ class _BlindFrameScreenState extends State<BlindFrameScreen> {
     final movie = _currentMovie;
 
     if (_gameOver) {
-      _showResult();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showResult());
       return Scaffold(
         backgroundColor: AppColors.bgDark,
         appBar: AppBar(

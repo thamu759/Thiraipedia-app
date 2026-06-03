@@ -17,7 +17,6 @@ class TrailerPlayerScreen extends StatefulWidget {
 }
 
 class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
-  static int _counter = 0;
   late final String _containerId;
 
   String _extractVideoId(String url) {
@@ -35,8 +34,7 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _counter++;
-    _containerId = 'trailer-overlay-$_counter';
+    _containerId = 'trailer-${DateTime.now().millisecondsSinceEpoch}';
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final id = _extractVideoId(widget.trailerUrl);
       if (id.length > 5 && id.length < 20) {
@@ -52,7 +50,6 @@ class _TrailerPlayerScreenState extends State<TrailerPlayerScreen> {
       } else {
         openWindow(widget.trailerUrl, '_blank');
       }
-      if (mounted) Navigator.pop(context);
     });
   }
 

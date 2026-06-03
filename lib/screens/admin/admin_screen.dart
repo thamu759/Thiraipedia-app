@@ -57,7 +57,7 @@ class AdminScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold, fontSize: 15)),
                 Text(subtitle,
                     style: const TextStyle(
-                        color: AppTheme.textSecondary, fontSize: 12)),
+                        color: AppTheme.textMuted, fontSize: 12)),
               ],
             ),
           ),

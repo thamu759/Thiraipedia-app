@@ -7,6 +7,7 @@ import '../models/community_thread.dart';
 import '../models/list_model.dart';
 
 class ApiService {
+  static void Function()? onUnauthorized;
   final http.Client _client = http.Client();
 
   Future<dynamic> _get(String path, {String? token}) async {
@@ -59,11 +60,15 @@ class ApiService {
       if (response.body.isEmpty) return {'success': true};
       return jsonDecode(response.body);
     }
+    if (response.statusCode == 401) {
+      onUnauthorized?.call();
+      throw UnauthorizedException();
+    }
     try {
       final body = jsonDecode(response.body);
       throw ApiException(body['error'] ?? 'Something went wrong');
     } catch (e) {
-      if (e is ApiException) rethrow;
+      if (e is ApiException || e is UnauthorizedException) rethrow;
       throw ApiException('Server error (${response.statusCode})');
     }
   }
@@ -94,6 +99,12 @@ class ApiService {
   Future<Movie> getMovieById(String id) async {
     final result = await _get('/movies/$id');
     return Movie.fromJson(result as Map<String, dynamic>);
+  }
+
+  Future<List<Movie>> getMoviesByIds(List<String> ids) async {
+    if (ids.isEmpty) return [];
+    final result = await _get('/movies/batch?ids=${ids.join(',')}');
+    return _parseMovies(result);
   }
 
   Future<Movie> addReview(String movieId,
@@ -231,6 +242,18 @@ class ApiService {
     await _delete('/lists/$listId/movies/$movieId', token: token);
   }
 
+  Future<Map<String, dynamic>> sendOtp({required String email}) async {
+    final result = await _post('/auth/send-otp', body: {'email': email});
+    return result as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> verifyOtp(
+      {required String email, required String otp}) async {
+    final result = await _post('/auth/verify-otp',
+        body: {'email': email, 'otp': otp});
+    return result as Map<String, dynamic>;
+  }
+
   Future<void> deleteList(String listId, {required String token}) async {
     await _delete('/lists/$listId', token: token);
   }
@@ -258,4 +281,9 @@ class ApiException implements Exception {
   ApiException(this.message);
   @override
   String toString() => message;
+}
+
+class UnauthorizedException implements Exception {
+  @override
+  String toString() => 'Session expired. Please sign in again.';
 }

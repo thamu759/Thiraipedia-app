@@ -14,6 +14,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
   late AnimationController _controller;
   late Animation<double> _spinAnim;
   double _angle = 0;
+  double _targetTurns = 0;
   String _result = '';
   bool _spinning = false;
   int? _winIndex;
@@ -55,7 +56,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 5));
     _spinAnim = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
     _spinAnim.addListener(() {
-      setState(() => _angle = _spinAnim.value * 2 * pi * (6 + _rng.nextDouble() * 4));
+      setState(() => _angle = _spinAnim.value * 2 * pi * _targetTurns);
     });
   }
 
@@ -75,6 +76,8 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
     _spinning = true;
     _result = '';
     _winIndex = null;
+    _targetTurns = 6 + _rng.nextDouble() * 4;
+    _angle = 0;
     _controller.reset();
     _controller.forward().then((_) {
       final idx = _rng.nextInt(_movies.length);
@@ -88,6 +91,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen>
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: AppColors.bgDark,
       appBar: AppBar(

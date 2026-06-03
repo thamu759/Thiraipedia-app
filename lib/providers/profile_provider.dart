@@ -32,7 +32,10 @@ class ProfileProvider with ChangeNotifier {
     try {
       _users = await _api.getUsers();
       notifyListeners();
-    } catch (_) {}
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
   }
 
   Future<void> followUser(String username, {required String token}) async {
@@ -47,5 +50,11 @@ class ProfileProvider with ChangeNotifier {
     if (_profileUser != null) {
       await fetchUser(_profileUser!.username);
     }
+  }
+
+  @override
+  void dispose() {
+    _api.dispose();
+    super.dispose();
   }
 }

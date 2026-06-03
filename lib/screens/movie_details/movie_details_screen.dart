@@ -23,7 +23,7 @@ class MovieDetailsScreen extends StatefulWidget {
 
 class _MovieDetailsScreenState extends State<MovieDetailsScreen>
     with SingleTickerProviderStateMixin {
-  static int _trailerId = 0;
+  int _trailerId = 0;
   Timer? _adTimer;
   bool _showFullDescription = false;
   bool _isWriteReviewOpen = false;
@@ -142,10 +142,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
               MovieSection(
                 title: 'Similar Movies',
                 movies: provider.similarMovies,
-                onMovieTap: (id) {
-                  setState(() {});
-                  context.read<MovieProvider>().loadMovieById(id);
-                },
+        onMovieTap: (id) {
+          context.read<MovieProvider>().loadMovieById(id);
+        },
               ),
             const SizedBox(height: 32),
           ],
@@ -585,7 +584,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                       Navigator.pushNamed(context, '/auth');
                       return;
                     }
-                    provider.toggleLike(movie.id, r.id, token: auth.token);
+                    provider.toggleLike(movie.id, r.id, token: auth.token!);
                   },
                 ),
               )).toList(),
@@ -695,7 +694,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                     await provider.addReview(movie.id,
                       rating: _reviewRating.toDouble(),
                       text: _reviewTextController.text.trim(),
-                      token: auth.token,
+                      token: auth.token!,
                     );
                     if (!mounted) return;
                     setState(() {

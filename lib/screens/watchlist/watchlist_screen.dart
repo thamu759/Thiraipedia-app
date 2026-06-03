@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../providers/watchlist_provider.dart';
-import '../../providers/movie_provider.dart';
 import '../../models/movie.dart';
+import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../movie_details/movie_details_screen.dart';
@@ -17,6 +18,7 @@ class WatchlistScreen extends StatefulWidget {
 class _WatchlistScreenState extends State<WatchlistScreen> {
   List<Movie>? _watchlistMovies;
   bool _loading = false;
+  final ApiService _api = ApiService();
 
   @override
   void initState() {
@@ -24,18 +26,22 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     _loadWatchlistMovies();
   }
 
+  @override
+  void dispose() {
+    _api.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadWatchlistMovies() async {
     final wl = context.read<WatchlistProvider>();
     if (wl.isEmpty) return;
     setState(() => _loading = true);
-    final mp = context.read<MovieProvider>();
-    await mp.loadMovies();
-    final allMovies = mp.movies;
-    setState(() {
-      _watchlistMovies =
-          allMovies.where((m) => wl.movieIds.contains(m.id)).toList();
-      _loading = false;
-    });
+    try {
+      _watchlistMovies = await _api.getMoviesByIds(wl.movieIds);
+    } catch (_) {
+      _watchlistMovies = [];
+    }
+    setState(() => _loading = false);
   }
 
   @override
@@ -53,7 +59,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                       size: 64, color: AppTheme.textMuted),
                   SizedBox(height: 16),
                   Text('Your watchlist is empty',
-                      style: TextStyle(color: AppTheme.textSecondary)),
+                      style: TextStyle(color: AppTheme.textMuted)),
                   SizedBox(height: 8),
                   Text('Add movies to keep track',
                       style: TextStyle(color: AppTheme.textMuted)),
@@ -90,7 +96,8 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                                 movieId: movie.id))),
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.network(movie.posterUrl,
+                      child: CachedNetworkImage(
+                          imageUrl: movie.posterUrl,
                           width: 50, height: 70, fit: BoxFit.cover),
                     ),
                     title: Text(movie.title,
@@ -99,7 +106,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                     subtitle:
                         Text(movie.genre,
                             style: const TextStyle(
-                                color: AppTheme.textSecondary)),
+                                color: AppTheme.textMuted)),
                     trailing: Text(movie.rating.toStringAsFixed(1),
                         style: const TextStyle(
                             color: AppTheme.primaryColor,

@@ -52,4 +52,10 @@ class CommunityProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  @override
+  void dispose() {
+    _api.dispose();
+    super.dispose();
+  }
 }

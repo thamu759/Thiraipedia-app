@@ -35,7 +35,7 @@ class ActorScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(member.role,
                 style: const TextStyle(
-                    color: AppTheme.textSecondary, fontSize: 16)),
+                    color: AppTheme.textMuted, fontSize: 16)),
           ],
         ),
       ),

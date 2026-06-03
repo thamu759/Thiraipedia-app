@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../models/movie.dart';
 import '../../../models/user.dart';
+import '../../../providers/movie_provider.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../theme/app_colors.dart';
 
 class ReviewCard extends StatefulWidget {
@@ -199,7 +202,16 @@ class _ReviewCardState extends State<ReviewCard> {
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
-                    onTap: () => _replyController.clear(),
+                    onTap: () {
+                      if (_replyController.text.trim().isEmpty) return;
+                      context.read<MovieProvider>().addReviewReply(
+                        widget.movieId,
+                        widget.review.id,
+                        body: _replyController.text.trim(),
+                        token: context.read<AuthProvider>().token ?? '',
+                      );
+                      _replyController.clear();
+                    },
                     child: Container(
                       width: 36,
                       height: 36,

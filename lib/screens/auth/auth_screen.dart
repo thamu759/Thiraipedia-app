@@ -17,6 +17,25 @@ class _AuthScreenState extends State<AuthScreen> {
   final _emailCtl = TextEditingController();
   final _passwordCtl = TextEditingController();
   bool _obscure = true;
+  int _passwordStrength = 0;
+  String? _passwordError;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordCtl.addListener(_updateStrength);
+  }
+
+  void _updateStrength() {
+    final p = _passwordCtl.text;
+    int score = 0;
+    if (p.length >= 8) score++;
+    if (p.contains(RegExp(r'[A-Z]'))) score++;
+    if (p.contains(RegExp(r'[a-z]'))) score++;
+    if (p.contains(RegExp(r'[0-9]'))) score++;
+    if (p.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) score++;
+    setState(() => _passwordStrength = score);
+  }
 
   @override
   void dispose() {
@@ -176,6 +195,42 @@ class _AuthScreenState extends State<AuthScreen> {
           icon: Icons.lock_outline,
           obscure: true,
         ),
+        if (!_isLogin && _passwordCtl.text.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _buildStrengthBar(),
+        ],
+        if (_passwordError != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(_passwordError!, style: const TextStyle(color: Color(0xFFE53935), fontSize: 12, fontFamily: 'Poppins')),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildStrengthBar() {
+    final labels = ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+    final colors = [const Color(0xFFE53935), const Color(0xFFFB8C00), const Color(0xFFFDD835), const Color(0xFF43A047), const Color(0xFF00C853)];
+    final label = labels[_passwordStrength];
+    final color = colors[_passwordStrength];
+    final segments = List.generate(5, (i) => i < _passwordStrength);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: List.generate(5, (i) => Expanded(
+            child: Container(
+              height: 4,
+              margin: EdgeInsets.only(right: i < 4 ? 4 : 0),
+              decoration: BoxDecoration(
+                color: segments[i] ? color : AppColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          )),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(color: color, fontSize: 11, fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
       ],
     );
   }
@@ -336,6 +391,11 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
+  String? _validatePassword(String password) {
+    if (password.length < 6) return 'At least 6 characters required';
+    return null;
+  }
+
   Future<void> _handleAuth(AuthProvider auth) async {
     final username = _usernameCtl.text.trim();
     final password = _passwordCtl.text.trim();
@@ -343,8 +403,14 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!_isLogin) {
       final email = _emailCtl.text.trim();
       if (email.isEmpty) return;
+      final pwdError = _validatePassword(password);
+      if (pwdError != null) {
+        setState(() => _passwordError = pwdError);
+        return;
+      }
+      setState(() => _passwordError = null);
       final success = await auth.register(username, email, password);
-      if (success && mounted) Navigator.pushReplacementNamed(context, '/');
+      if (success && mounted) Navigator.pushReplacementNamed(context, '/otp-verify', arguments: email);
     } else {
       final success = await auth.login(username, password);
       if (success && mounted) Navigator.pushReplacementNamed(context, '/');
