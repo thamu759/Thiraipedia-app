@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.view.WindowManager
 import androidx.core.view.WindowCompat
 import io.flutter.embedding.android.FlutterActivity
 
@@ -15,10 +16,12 @@ class MainActivity : FlutterActivity() {
     private val hideRunnable = Runnable { hideSystemUi() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         super.onCreate(savedInstanceState)
         hideSystemUi()
         hideHandler.postDelayed(hideRunnable, 100)
-        hideHandler.postDelayed(hideRunnable, 500)
+        hideHandler.postDelayed(hideRunnable, 300)
+        hideHandler.postDelayed(hideRunnable, 800)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -32,6 +35,7 @@ class MainActivity : FlutterActivity() {
     override fun onResume() {
         super.onResume()
         hideHandler.postDelayed(hideRunnable, 150)
+        hideHandler.postDelayed(hideRunnable, 600)
     }
 
     private fun hideSystemUi() {
@@ -39,7 +43,7 @@ class MainActivity : FlutterActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.let {
                 it.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_BARS_BY_TOUCH
             }
         } else {
             @Suppress("DEPRECATION")
