@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
+import '../main_shell.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String email;
@@ -40,7 +41,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     final ok = await context.read<AuthProvider>().verifyOtp(widget.email, otp);
     if (!mounted) return;
     if (ok) {
-      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainShell()),
+        (route) => false,
+      );
     } else {
       setState(() { _loading = false; _error = context.read<AuthProvider>().error ?? 'Invalid OTP'; });
     }

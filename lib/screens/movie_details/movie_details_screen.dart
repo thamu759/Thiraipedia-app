@@ -11,6 +11,7 @@ import '../../widgets/skeleton_loading.dart';
 import 'widgets/cast_section.dart';
 import 'widgets/review_card.dart';
 import '../home/widgets/movie_section.dart';
+import '../auth/auth_screen.dart';
 import '../../theme/app_colors.dart';
 
 class MovieDetailsScreen extends StatefulWidget {
@@ -410,7 +411,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
             child: GestureDetector(
               onTap: () {
                 if (!auth.isLoggedIn) {
-                  Navigator.pushNamed(context, '/auth');
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
                   return;
                 }
                 setState(() => _isWriteReviewOpen = true);
@@ -581,7 +582,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                   currentUser: auth.currentUser,
                   onLike: () {
                     if (!auth.isLoggedIn) {
-                      Navigator.pushNamed(context, '/auth');
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
                       return;
                     }
                     provider.toggleLike(movie.id, r.id, token: auth.token!);
@@ -687,7 +688,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                 onTap: () async {
                   if (_reviewTextController.text.trim().isEmpty) return;
                   if (!auth.isLoggedIn) {
-                    Navigator.pushNamed(context, '/auth');
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
                     return;
                   }
                   try {
