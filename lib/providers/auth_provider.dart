@@ -79,7 +79,9 @@ class AuthProvider with ChangeNotifier {
     try {
       await _api.sendOtp(email: email);
       return true;
-    } catch (_) {
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
       return false;
     }
   }

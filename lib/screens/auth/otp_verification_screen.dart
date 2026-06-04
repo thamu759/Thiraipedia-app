@@ -26,9 +26,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   Future<void> _sendOtp() async {
     setState(() => _error = null);
-    final ok = await context.read<AuthProvider>().sendOtp(widget.email);
+    final auth = context.read<AuthProvider>();
+    final ok = await auth.sendOtp(widget.email);
     if (!mounted) return;
-    if (!ok) setState(() => _error = 'Failed to send OTP. Try again.');
+    if (!ok) setState(() => _error = auth.error ?? 'Failed to send OTP.');
   }
 
   Future<void> _verify() async {
@@ -53,10 +54,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   Future<void> _resend() async {
     setState(() { _resending = true; _error = null; _otpCtl.clear(); });
-    final ok = await context.read<AuthProvider>().sendOtp(widget.email);
+    final auth = context.read<AuthProvider>();
+    final ok = await auth.sendOtp(widget.email);
     if (!mounted) return;
     setState(() => _resending = false);
-    if (!ok) setState(() => _error = 'Failed to resend OTP.');
+    if (!ok) setState(() => _error = auth.error ?? 'Failed to resend OTP.');
   }
 
   @override
