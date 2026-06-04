@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
-import '../../widgets/app_bottom_nav.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -79,7 +78,6 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const AppBottomNav(activeIndex: 2),
     );
   }
 
@@ -410,10 +408,10 @@ class _AuthScreenState extends State<AuthScreen> {
       }
       setState(() => _passwordError = null);
       final success = await auth.register(username, email, password);
-      if (success && mounted) Navigator.pushReplacementNamed(context, '/otp-verify', arguments: email);
+      if (success && mounted) Navigator.pushNamed(context, '/otp-verify', arguments: email);
     } else {
       final success = await auth.login(username, password);
-      if (success && mounted) Navigator.pushReplacementNamed(context, '/');
+      if (success && mounted) Navigator.pop(context);
     }
   }
 }

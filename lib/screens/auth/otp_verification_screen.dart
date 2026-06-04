@@ -40,7 +40,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     final ok = await context.read<AuthProvider>().verifyOtp(widget.email, otp);
     if (!mounted) return;
     if (ok) {
-      Navigator.pushReplacementNamed(context, '/');
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
     } else {
       setState(() { _loading = false; _error = context.read<AuthProvider>().error ?? 'Invalid OTP'; });
     }

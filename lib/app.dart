@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
+import 'screens/main_shell.dart';
 import 'screens/onboarding/onboarding_screen.dart';
-import 'screens/home/home_screen.dart';
-import 'screens/search/search_screen.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/auth/otp_verification_screen.dart';
 import 'screens/watchlist/watchlist_screen.dart';
 import 'screens/coming_soon/coming_soon_screen.dart';
-import 'screens/profile/profile_screen.dart';
 import 'screens/community/community_screen.dart';
 import 'screens/admin/admin_screen.dart';
 import 'screens/lists/lists_screen.dart';
@@ -52,16 +50,16 @@ class ThiraiPediaApp extends StatelessWidget {
       title: 'ThiraiPedia',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: showOnboarding ? const OnboardingScreen() : const HomeScreen(),
+      home: showOnboarding ? const OnboardingScreen() : const MainShell(),
       onGenerateRoute: (settings) {
         final pages = <String, Widget>{
-          '/': const HomeScreen(),
-          '/search': const SearchScreen(),
+          '/': const MainShell(),
+          '/search': const MainShell(initialIndex: 1),
+          '/profile': const MainShell(initialIndex: 2),
           '/auth': const AuthScreen(),
           '/otp-verify': OtpVerificationScreen(email: settings.arguments as String),
           '/watchlist': const WatchlistScreen(),
           '/coming-soon': const ComingSoonScreen(),
-          '/profile': const ProfileScreen(),
           '/community': const CommunityScreen(),
           '/admin': const AdminScreen(),
           '/lists': const ListsScreen(),

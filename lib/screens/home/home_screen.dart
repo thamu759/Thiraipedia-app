@@ -6,7 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/movie_provider.dart';
 import '../../providers/watchlist_provider.dart';
 import '../../theme/app_colors.dart';
-import '../../widgets/app_bottom_nav.dart';
+
 import '../../widgets/skeleton_loading.dart';
 import '../movie_details/movie_details_screen.dart';
 import '../see_all/see_all_screen.dart';
@@ -70,7 +70,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final mp = context.watch<MovieProvider>();
 
     return Scaffold(
-      bottomNavigationBar: const AppBottomNav(activeIndex: 0),
       body: mp.isLoading && mp.movies.isEmpty
           ? const SkeletonLoading(child: HomeSkeleton())
           : mp.error != null && mp.movies.isEmpty

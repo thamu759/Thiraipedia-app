@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int activeIndex;
+  final void Function(int index)? onTap;
 
-  const AppBottomNav({super.key, required this.activeIndex});
+  const AppBottomNav({super.key, required this.activeIndex, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
     final items = [
       (Icons.home_rounded, Icons.home_outlined),
       (Icons.search_rounded, Icons.search_outlined),
@@ -31,15 +29,7 @@ class AppBottomNav extends StatelessWidget {
               final isActive = i == activeIndex;
               final item = items[i];
               return GestureDetector(
-                onTap: () {
-                  if (i == activeIndex) return;
-                  if (auth.user == null && i == 2) {
-                    Navigator.pushReplacementNamed(context, '/auth');
-                    return;
-                  }
-                  final routes = ['/', '/search', '/profile'];
-                  Navigator.pushReplacementNamed(context, routes[i]);
-                },
+                onTap: () => onTap?.call(i),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   width: 48,

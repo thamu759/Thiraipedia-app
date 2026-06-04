@@ -6,7 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/html_utils.dart';
-import '../../widgets/app_bottom_nav.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -83,7 +83,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            bottomNavigationBar: const AppBottomNav(activeIndex: 2),
           );
         }
 
@@ -103,7 +102,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
-          bottomNavigationBar: const AppBottomNav(activeIndex: 2),
         );
       },
     );

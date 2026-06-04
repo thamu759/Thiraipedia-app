@@ -5,7 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/movie.dart';
 import '../../providers/movie_provider.dart';
 import '../../theme/app_colors.dart';
-import '../../widgets/app_bottom_nav.dart';
+
 import '../../widgets/skeleton_loading.dart';
 import '../movie_details/movie_details_screen.dart';
 
@@ -77,7 +77,6 @@ class _SearchScreenState extends State<SearchScreen>
             ],
           ),
         ),
-        bottomNavigationBar: const AppBottomNav(activeIndex: 1),
       ),
     );
   }
