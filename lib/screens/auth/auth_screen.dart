@@ -84,7 +84,24 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget _buildHeader() {
     return Column(
       children: [
-        const SizedBox(height: 24),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.bgCard,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: const Icon(Icons.close_rounded,
+                    color: AppColors.textMuted, size: 18),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         Image.asset('assets/logo.png', height: 48, fit: BoxFit.contain),
         const SizedBox(height: 20),
         Text(

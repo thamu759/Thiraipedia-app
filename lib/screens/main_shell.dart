@@ -34,19 +34,8 @@ class _MainShellState extends State<MainShell> {
     });
   }
 
-  Future<void> _onTap(int index) async {
+  void _onTap(int index) {
     if (index == _currentIndex) return;
-    if (index == 2) {
-      final auth = context.read<AuthProvider>();
-      if (auth.user == null) {
-        await Navigator.pushNamed(context, '/auth');
-        if (!mounted) return;
-        if (context.read<AuthProvider>().user != null) {
-          setState(() => _currentIndex = 2);
-        }
-        return;
-      }
-    }
     setState(() => _currentIndex = index);
   }
 
