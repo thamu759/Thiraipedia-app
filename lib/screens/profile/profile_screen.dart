@@ -7,6 +7,11 @@ import '../../providers/profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/html_utils.dart';
 import '../auth/auth_screen.dart';
+import '../admin/admin_screen.dart';
+import '../lists/lists_screen.dart';
+import '../about/about_screen.dart';
+import '../legal/legal_screen.dart';
+import '../contact/contact_screen.dart';
 
 
 class ProfileScreen extends StatefulWidget {
@@ -337,14 +342,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildMenu(AuthProvider auth) {
-    final items = [
-      (Icons.admin_panel_settings_outlined, 'Admin Panel', '/admin',
+    final items = <(IconData, String, Widget, bool)>[
+      (Icons.admin_panel_settings_outlined, 'Admin Panel', const AdminScreen(),
           auth.isAdmin),
-      (Icons.favorite_outline_rounded, 'My Lists', '/lists', true),
-      (Icons.info_outline_rounded, 'About', '/about', true),
-      (Icons.shield_outlined, 'Privacy Policy', '/privacy', true),
-      (Icons.description_outlined, 'Terms of Service', '/terms', true),
-      (Icons.mail_outline_rounded, 'Contact', '/contact', true),
+      (Icons.favorite_outline_rounded, 'My Lists', const ListsScreen(), true),
+      (Icons.info_outline_rounded, 'About', const AboutScreen(), true),
+      (Icons.shield_outlined, 'Privacy Policy', const LegalScreen(page: 'privacy'), true),
+      (Icons.description_outlined, 'Terms of Service', const LegalScreen(page: 'terms'), true),
+      (Icons.mail_outline_rounded, 'Contact', const ContactScreen(), true),
     ];
 
     return Padding(
@@ -354,7 +359,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final item = items[i];
           return GestureDetector(
             onTap: item.$4
-                ? () => Navigator.pushNamed(context, item.$3)
+                ? () => Navigator.push(context, MaterialPageRoute(builder: (_) => item.$3))
                 : null,
             child: Container(
               margin: const EdgeInsets.only(bottom: 8),
