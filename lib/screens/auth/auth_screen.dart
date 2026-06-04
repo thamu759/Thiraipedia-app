@@ -26,15 +26,20 @@ class _AuthScreenState extends State<AuthScreen> {
     _passwordCtl.addListener(_updateStrength);
   }
 
-  void _updateStrength() {
-    final p = _passwordCtl.text;
+  int _calcStrength(String p) {
     int score = 0;
     if (p.length >= 8) score++;
     if (p.contains(RegExp(r'[A-Z]'))) score++;
     if (p.contains(RegExp(r'[a-z]'))) score++;
     if (p.contains(RegExp(r'[0-9]'))) score++;
     if (p.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) score++;
-    setState(() => _passwordStrength = score);
+    if (score > 4) score = 4;
+    return score;
+  }
+
+  void _updateStrength() {
+    final s = _calcStrength(_passwordCtl.text);
+    if (s != _passwordStrength) setState(() => _passwordStrength = s);
   }
 
   @override
