@@ -10,6 +10,10 @@ import '../../theme/app_colors.dart';
 import '../../widgets/skeleton_loading.dart';
 import '../movie_details/movie_details_screen.dart';
 import '../see_all/see_all_screen.dart';
+import '../games/quiz_screen.dart';
+import '../games/card_flix_screen.dart';
+import '../games/blind_frame_screen.dart';
+import '../games/mood_matcher_screen.dart';
 import 'widgets/hero_carousel.dart';
 import 'widgets/movie_section.dart';
 import 'widgets/staff_picks_section.dart';
@@ -48,7 +52,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _navigateTo(String route) {
-    Navigator.pushNamed(context, route);
+    final pages = <String, Widget>{
+      '/quiz': const QuizScreen(),
+      '/card-flix': const CardFlixScreen(),
+      '/blind-frame': const BlindFrameScreen(),
+      '/mood-matcher': const MoodMatcherScreen(),
+    };
+    final page = pages[route];
+    if (page != null) Navigator.push(context, MaterialPageRoute(builder: (_) => page));
   }
 
   void _navigateToMovie(String movieId) {
