@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/html_utils.dart';
+import '../auth/auth_screen.dart';
 
 
 class ProfileScreen extends StatefulWidget {
@@ -59,7 +60,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     )),
                 const SizedBox(height: 16),
                 GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, '/auth'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AuthScreen()),
+                  ),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
