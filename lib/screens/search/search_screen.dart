@@ -67,15 +67,12 @@ class _SearchScreenState extends State<SearchScreen>
           primary: Colors.white,
         ),
       ),
-      child: Scaffold(
-        backgroundColor: AppColors.bgDark,
-        body: SafeArea(
-          child: Column(
-            children: [
-              _buildSearchBar(),
-              Expanded(child: _buildBody()),
-            ],
-          ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            _buildSearchBar(),
+            Expanded(child: _buildBody()),
+          ],
         ),
       ),
     );

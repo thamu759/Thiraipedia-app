@@ -69,24 +69,24 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final mp = context.watch<MovieProvider>();
 
-    return Scaffold(
-      body: mp.isLoading && mp.movies.isEmpty
-          ? const SkeletonLoading(child: HomeSkeleton())
-          : mp.error != null && mp.movies.isEmpty
-              ? _buildError(mp.error!)
-              : CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverPersistentHeader(
-              pinned: false,
-              floating: false,
-              delegate: _HeaderDelegate(maxHeight: MediaQuery.of(context).padding.top + 100),
-            ),
-            SliverToBoxAdapter(
-              child: _buildContent(mp),
-            ),
-          ],
+    if (mp.isLoading && mp.movies.isEmpty) {
+      return const SkeletonLoading(child: HomeSkeleton());
+    }
+    if (mp.error != null && mp.movies.isEmpty) {
+      return _buildError(mp.error!);
+    }
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverPersistentHeader(
+          pinned: false,
+          floating: false,
+          delegate: _HeaderDelegate(maxHeight: MediaQuery.of(context).padding.top + 100),
         ),
+        SliverToBoxAdapter(
+          child: _buildContent(mp),
+        ),
+      ],
     );
   }
 

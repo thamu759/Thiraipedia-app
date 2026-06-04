@@ -36,71 +36,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context, auth, profile, _) {
         final user = auth.user;
         if (user == null) {
-          return Scaffold(
-            backgroundColor: AppColors.bgDark,
-            body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 72,
-                    height: 72,
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(Icons.person_outline,
+                      color: Colors.white24, size: 36),
+                ),
+                const SizedBox(height: 20),
+                const Text('Not logged in',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      color: AppColors.textMuted,
+                      fontSize: 16,
+                    )),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/auth'),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.border,
-                      borderRadius: BorderRadius.circular(20),
+                      gradient: LinearGradient(colors: [
+                        AppColors.accent,
+                        AppColors.accentSecondary,
+                      ]),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.person_outline,
-                        color: Colors.white24, size: 36),
+                    child: const Text('Sign In',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700,
+                        )),
                   ),
-                  const SizedBox(height: 20),
-                  const Text('Not logged in',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: AppColors.textMuted,
-                        fontSize: 16,
-                      )),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, '/auth'),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [
-                          AppColors.accent,
-                          AppColors.accentSecondary,
-                        ]),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text('Sign In',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            color: Colors.black,
-                            fontWeight: FontWeight.w700,
-                          )),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }
 
-        return Scaffold(
-          backgroundColor: AppColors.bgDark,
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildHeader(user),
-                const SizedBox(height: 20),
-                _buildStats(user),
-                const SizedBox(height: 24),
-                _buildActions(auth),
-                const SizedBox(height: 24),
-                _buildMenu(auth),
-                const SizedBox(height: 32),
-              ],
-            ),
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              _buildHeader(user),
+              const SizedBox(height: 20),
+              _buildStats(user),
+              const SizedBox(height: 24),
+              _buildActions(auth),
+              const SizedBox(height: 24),
+              _buildMenu(auth),
+              const SizedBox(height: 32),
+            ],
           ),
         );
       },
