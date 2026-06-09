@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../models/cine_update.dart';
 import '../../providers/movie_provider.dart';
 import '../../theme/app_colors.dart';
@@ -73,6 +74,11 @@ class _ReelsScreenState extends State<ReelsScreen>
         _likedIds.add(id);
       }
     });
+  }
+
+  void _shareReel(CineUpdate item) {
+    final text = '🎬 ${item.title}\n\n${item.body}\n\n📽️ Movie: ${item.movieName}\n📰 ${item.category}\n\nvia ThiraiPedia';
+    SharePlus.instance.share(ShareParams(text: text));
   }
 
   Color _categoryColor(String category) {
@@ -340,6 +346,33 @@ class _ReelsScreenState extends State<ReelsScreen>
                           color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
+                        )),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => _shareReel(item),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                      ),
+                      child: const Icon(Icons.send_rounded, color: Colors.white, size: 22),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('Share',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
                         )),
                   ],
                 ),

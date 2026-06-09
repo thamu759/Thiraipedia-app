@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../models/movie.dart';
 import '../../providers/movie_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -398,21 +399,52 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(inWatchlist ? Icons.bookmark : Icons.bookmark_border, size: 18, color: inWatchlist ? AppColors.accent : AppColors.textMuted),
-                    const SizedBox(width: 6),
+                    Icon(inWatchlist ? Icons.bookmark : Icons.bookmark_border, size: 16, color: inWatchlist ? AppColors.accent : AppColors.textMuted),
+                    const SizedBox(width: 4),
                     Text(inWatchlist ? 'Saved' : 'Watchlist',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           color: inWatchlist ? AppColors.accent : AppColors.textMuted,
                           fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                          fontSize: 11,
                         )),
                   ],
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                final text = '🎬 ${movie.title}\n\n${movie.description}\n\n⭐ Rating: ${movie.rating}/10\n📅 ${movie.releaseYear} | ${movie.language}\n\nvia ThiraiPedia';
+                SharePlus.instance.share(ShareParams(text: text));
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.bgCard,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.send_rounded, size: 16, color: AppColors.textMuted),
+                    SizedBox(width: 4),
+                    Text('Share',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        )),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           Expanded(
             child: GestureDetector(
               onTap: () {
@@ -428,17 +460,17 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                   color: AppColors.accent,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.rate_review_outlined, size: 18, color: Colors.black),
-                          SizedBox(width: 6),
-                    Text('Write Review',
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.rate_review_outlined, size: 16, color: Colors.black),
+                    SizedBox(width: 4),
+                    Text('Review',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           color: Colors.black,
                           fontWeight: FontWeight.w700,
-                          fontSize: 13,
+                          fontSize: 11,
                         )),
                   ],
                 ),
