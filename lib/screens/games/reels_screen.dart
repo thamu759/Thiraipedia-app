@@ -304,9 +304,10 @@ class _ReelsScreenState extends State<ReelsScreen>
           ),
         ),
         Positioned(
-          right: 16,
-          bottom: 160,
+          right: 12,
+          bottom: 200,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               GestureDetector(
                 onTap: () => _toggleLike(item.id),
@@ -344,13 +345,13 @@ class _ReelsScreenState extends State<ReelsScreen>
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: FontWeight.w600,
                         )),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               GestureDetector(
                 onTap: () => _shareReel(item),
                 child: Column(
@@ -364,7 +365,7 @@ class _ReelsScreenState extends State<ReelsScreen>
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                       ),
-                      child: const Icon(Icons.send_rounded, color: Colors.white, size: 22),
+                      child: const Icon(Icons.share, color: Colors.white, size: 22),
                     ),
                     const SizedBox(height: 4),
                     Text('Share',

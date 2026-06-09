@@ -430,7 +430,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.send_rounded, size: 16, color: AppColors.textMuted),
+                    Icon(Icons.share, size: 16, color: AppColors.textMuted),
                     SizedBox(width: 4),
                     Text('Share',
                         style: TextStyle(
