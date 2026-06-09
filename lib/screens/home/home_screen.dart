@@ -14,6 +14,7 @@ import '../games/quiz_screen.dart';
 import '../games/card_flix_screen.dart';
 import '../games/blind_frame_screen.dart';
 import '../games/mood_matcher_screen.dart';
+import '../games/reels_screen.dart';
 import 'widgets/hero_carousel.dart';
 import 'widgets/movie_section.dart';
 import 'widgets/staff_picks_section.dart';
@@ -49,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     context.read<AuthProvider>().verifySession();
     context.read<MovieProvider>().loadMovies();
     context.read<MovieProvider>().loadNewReleases();
+    context.read<MovieProvider>().loadCineUpdates();
   }
 
   void _navigateTo(String route) {
@@ -57,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       '/card-flix': const CardFlixScreen(),
       '/blind-frame': const BlindFrameScreen(),
       '/mood-matcher': const MoodMatcherScreen(),
+      '/reels': const ReelsScreen(),
     };
     final page = pages[route];
     if (page != null) Navigator.push(context, MaterialPageRoute(builder: (_) => page));
@@ -145,8 +148,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           if (mp.heroMovies.isNotEmpty)
             SizedBox(
               height: 440,
-              child: HeroCarousel(
+              child:             HeroCarousel(
                 movies: mp.heroMovies,
+                movieLogos: mp.movieLogos,
                 onMovieTap: _navigateToMovie,
                 onWatchlistToggle: (id) => context.read<WatchlistProvider>().toggleWatchlist(id),
                 isInWatchlist: (id) => context.read<WatchlistProvider>().isInWatchlist(id),
@@ -201,12 +205,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       );
     }
 
+
+
+
+
+
+
   Widget _buildFunActivities() {
     final activities = [
       ('Quiz', Icons.quiz, '/quiz', 'Test your film knowledge', const Color(0xFFE57373)),
       ('Card Flix', Icons.style, '/card-flix', 'Swipe & pick', const Color(0xFF64B5F6)),
       ('Blind Frame', Icons.blur_on, '/blind-frame', 'Guess the movie', const Color(0xFF81C784)),
       ('Mood Matcher', Icons.mood, '/mood-matcher', 'Find by mood', const Color(0xFFBA68C8)),
+      ('Reels', Icons.videocam_rounded, '/reels', 'Swipe movies', const Color(0xFFE91E63)),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

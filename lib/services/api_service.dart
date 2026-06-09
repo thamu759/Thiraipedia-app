@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/movie.dart';
+import '../models/cine_update.dart';
 import '../models/user.dart';
 import '../models/community_thread.dart';
 import '../models/list_model.dart';
@@ -105,6 +106,13 @@ class ApiService {
     if (ids.isEmpty) return [];
     final result = await _get('/movies/batch?ids=${ids.join(',')}');
     return _parseMovies(result);
+  }
+
+  Future<List<CineUpdate>> getCineUpdates() async {
+    final result = await _get('/cine-updates');
+    return (result as List)
+        .map((e) => CineUpdate.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<Movie> addReview(String movieId,

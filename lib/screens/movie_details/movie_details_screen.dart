@@ -127,6 +127,10 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                     const SizedBox(height: 20),
                     _buildActionButtons(movie, auth, watchlist),
                     const SizedBox(height: 24),
+                    if (movie.ott != null) ...[
+                      _buildOttInfo(movie.ott!),
+                      const SizedBox(height: 24),
+                    ],
                     _buildSynopsis(movie),
                     const SizedBox(height: 24),
                     if (movie.cast.isNotEmpty) ...[
@@ -139,7 +143,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
                 ),
               ),
             ),
-            if (provider.similarMovies.isNotEmpty)
+            if (provider.similarLoading)
+              _buildSimilarShimmer()
+            else if (provider.similarMovies.isNotEmpty)
               MovieSection(
                 title: 'Similar Movies',
                 movies: provider.similarMovies,
@@ -441,6 +447,173 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildOttInfo(OttInfo ott) {
+    final platformColors = <String, Color>{
+      'netflix': const Color(0xFFE50914),
+      'amazon': const Color(0xFFFF9900),
+      'prime': const Color(0xFF00A8E1),
+      'hotstar': const Color(0xFF1A1A2E),
+      'disney': const Color(0xFF113CCF),
+      'aha': const Color(0xFFE53935),
+      'zee5': const Color(0xFFFF5722),
+      'sonyliv': const Color(0xFF1A237E),
+      'jiohotstar': const Color(0xFF1A1A2E),
+      'sun nxt': const Color(0xFFFF6600),
+    };
+    final platformLower = ott.platform.toLowerCase();
+    Color chipColor = AppColors.accent;
+    for (final entry in platformColors.entries) {
+      if (platformLower.contains(entry.key)) {
+        chipColor = entry.value;
+        break;
+      }
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOutCubic,
+      builder: (context, val, child) => Transform.translate(
+        offset: Offset(0, 30 * (1 - val)),
+        child: Opacity(opacity: val, child: child),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Watch Now',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFDDDDDD),
+              )),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              if (ott.url.isNotEmpty) {
+                openWindow(ott.url, '_blank');
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: chipColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: chipColor.withValues(alpha: 0.25)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: chipColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.play_circle_fill_rounded,
+                      color: chipColor,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(ott.platform,
+                            style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            )),
+                        if (ott.releaseDate.isNotEmpty)
+                          Text(ott.releaseDate,
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                color: AppColors.textMuted,
+                                fontSize: 11,
+                              )),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios,
+                      color: chipColor, size: 14),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimilarShimmer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+          child: Text('Similar Movies',
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFDDDDDD),
+              )),
+        ),
+        SizedBox(
+          height: 280,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 5,
+            itemBuilder: (_, _) => Container(
+              width: 185,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.border),
+                color: AppColors.bgCard,
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Container(color: AppColors.bgDark),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ShimmerPlaceholder(
+                            width: 120, height: 13, borderRadius: 3),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            ShimmerPlaceholder(
+                                width: 50, height: 11, borderRadius: 3),
+                            SizedBox(width: 8),
+                            ShimmerPlaceholder(
+                                width: 30, height: 11, borderRadius: 3),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

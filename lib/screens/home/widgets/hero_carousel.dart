@@ -6,6 +6,7 @@ import '../../../theme/app_colors.dart';
 
 class HeroCarousel extends StatefulWidget {
   final List<Movie> movies;
+  final Map<String, String> movieLogos;
   final void Function(String movieId) onMovieTap;
   final void Function(String movieId) onWatchlistToggle;
   final bool Function(String movieId) isInWatchlist;
@@ -13,6 +14,7 @@ class HeroCarousel extends StatefulWidget {
   const HeroCarousel({
     super.key,
     required this.movies,
+    this.movieLogos = const {},
     required this.onMovieTap,
     required this.onWatchlistToggle,
     required this.isInWatchlist,
@@ -182,42 +184,11 @@ class _HeroCarouselState extends State<HeroCarousel> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  movie.titleLogo.isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: movie.titleLogo,
-                          height: 36,
-                          fit: BoxFit.contain,
-                          alignment: Alignment.centerLeft,
-                          placeholder: (_, _) => const SizedBox.shrink(),
-                          errorWidget: (_, _, _) => Text(movie.title,
-                              style: const TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 28,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: -0.3,
-                                height: 1.1,
-                                shadows: [Shadow(color: Colors.black87, blurRadius: 12)],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis),
-                        )
-                      : Text(movie.title,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: -0.3,
-                            height: 1.1,
-                            shadows: [Shadow(color: Colors.black87, blurRadius: 12)],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
+                  Row(children: [_buildTitle(movie)]),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      _metaChip(movie.genre),
+                      Flexible(child: _metaChip(movie.genre)),
                       const SizedBox(width: 8),
                       Text('${movie.releaseYear}',
                           style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12, fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
@@ -231,9 +202,9 @@ class _HeroCarouselState extends State<HeroCarousel> {
                   const SizedBox(height: 14),
                   Row(
                     children: [
-                      _actionButton(Icons.play_arrow_rounded, 'View', true, () => widget.onMovieTap(movie.id)),
+                      Flexible(child: _actionButton(Icons.play_arrow_rounded, 'View', true, () => widget.onMovieTap(movie.id))),
                       const SizedBox(width: 10),
-                      _watchlistButton(movie.id),
+                      Flexible(child: _watchlistButton(movie.id)),
                     ],
                   ),
                 ],
@@ -271,6 +242,69 @@ class _HeroCarouselState extends State<HeroCarousel> {
       inWatchlist ? 'In Watchlist' : 'Watchlist',
       inWatchlist,
       () => widget.onWatchlistToggle(movieId),
+    );
+  }
+
+  Widget _buildTitle(Movie movie) {
+    final logoUrl = widget.movieLogos[movie.id] ?? '';
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          color: Colors.black.withValues(alpha: 0.4),
+        child: logoUrl.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: logoUrl,
+                height: 40,
+                fit: BoxFit.contain,
+                alignment: Alignment.centerLeft,
+                placeholder: (_, _) => ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [Colors.white, Colors.white70],
+                  ).createShader(bounds),
+                  child: Text(movie.title,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.3,
+                        height: 1.1,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
+                ),
+                errorWidget: (_, _, _) => Text(movie.title,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -0.3,
+                      height: 1.1,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
+              )
+            : ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: [Colors.white, Colors.white.withValues(alpha: 0.85)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(bounds),
+                child: Text(movie.title,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
+              ),
+      ),
     );
   }
 

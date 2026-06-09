@@ -17,6 +17,7 @@ import 'screens/games/card_flix_screen.dart';
 import 'screens/games/blind_frame_screen.dart';
 import 'screens/games/mood_matcher_screen.dart';
 import 'screens/games/spin_wheel_screen.dart';
+import 'screens/games/reels_screen.dart';
 import 'screens/legal/legal_screen.dart';
 import 'screens/about/about_screen.dart';
 import 'screens/contact/contact_screen.dart';
@@ -70,8 +71,9 @@ class ThiraiPediaApp extends StatelessWidget {
           '/card-flix': const CardFlixScreen(),
           '/blind-frame': const BlindFrameScreen(),
           '/mood-matcher': const MoodMatcherScreen(),
-          '/spin-wheel': const SpinWheelScreen(),
-          '/privacy': const LegalScreen(page: 'privacy'),
+        '/spin-wheel': const SpinWheelScreen(),
+        '/reels': const ReelsScreen(),
+        '/privacy': const LegalScreen(page: 'privacy'),
           '/terms': const LegalScreen(page: 'terms'),
           '/about': const AboutScreen(),
           '/contact': const ContactScreen(),
